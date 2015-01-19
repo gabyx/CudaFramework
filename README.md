@@ -7,8 +7,9 @@ Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems
 ----------------------------------------
 
 This source code accompanies the paper   
-*G. Nützi et al. , Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems, 2014*
-[1](http://proceedings.asmedigitalcollection.asme.org/proceeding.aspx?articleID=2091012) or [2](http://www.zfm.ethz.ch/~nuetzig/_private_files/projective.pdf)
+
+> **G. Nützi et al. , Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems, 2014** , download : [1](http://proceedings.asmedigitalcollection.asme.org/proceeding.aspx?articleID=2091012) or [2](http://www.zfm.ethz.ch/~nuetzig/_private_files/projective.pdf)
+
 The [master thesis](http://dx.doi.org/10.3929/ethz-a-010054012) should be consulted only in the case of being interested in the details of certain GPU variants (see below).
 
 ---------------------------
@@ -104,8 +105,8 @@ Each GPU variant has a ``initializeTestProblem()`` function which fills the iter
 Each GPU variant also has ``runGPUProfile()`` and ``runGPUPlain()`` functions which launch the GPU variants with or without timing information.
 
 To get to the bottom of the prox iteration variants, consider the the kernels A and B involved in the GPU variant ``SorProxGPUVariant``. These are launched sequentially over the iteration matrix ``T_dev`` as shown in the following:
-
-for(m_nIterGPU=0; m_nIterGPU< m_nMaxIterations ; m_nIterGPU++){
+```C
+    for(m_nIterGPU=0; m_nIterGPU< m_nMaxIterations ; m_nIterGPU++){
 
             // Swap pointers of old and new on the device
             std::swap(x_old_dev.m_pDevice, x_new_dev.m_pDevice);
@@ -128,6 +129,30 @@ for(m_nIterGPU=0; m_nIterGPU< m_nMaxIterations ; m_nIterGPU++){
                   );
 
             }
+```
+
+**Interfacing with Own Code:**
+The best way to use the SORProx or JORProx GPU implementations right out of the box is to instantiate the following
+variant types somewhere in your code:
+```C++
+   JorProxGPUVariant< JorProxGPUVariantSettingsWrapper<PREC,5,ConvexSets::RPlusAndDisk,true,300,true,10,false, TemplateHelper::Default>, ConvexSets::RPlusAndDisk > m_jorGPUVariant;
+
+   SorProxGPUVariant< SorProxGPUVariantSettingsWrapper<PREC,1,ConvexSets::RPlusAndDisk,true,300,true,10,true,  TemplateHelper::Default >,  ConvexSets::RPlusAndDisk > m_sorGPUVariant;
+```
+
+and then launching the iterations with something like this:
+
+```C++
+        m_jorGPUVariant.setSettings(m_settings.m_MaxIter,m_settings.m_AbsTol,m_settings.m_RelTol);
+        gpuSuccess = m_jorGPUVariant.runGPUPlain(P_front,m_T,P_back,m_d,m_mu);
+        m_globalIterationCounter = m_jorGPUVariant.m_nIterGPU;
+        /* OR */
+        m_sorGPUVariant.setSettings(m_settings.m_MaxIter,m_settings.m_AbsTol,m_settings.m_RelTol);
+        gpuSuccess = m_sorGPUVariant.runGPUPlain(P_front,m_T,P_back,m_d,m_mu);
+        m_globalIterationCounter = m_jorGPUVariant.m_nIterGPU;
+```
+Matrices ``m_T`` and ``m_d`` are built as described in the paper. Vector ``m_mu`` are the friction coefficients for all contacts which consist of a normal and two tangential forces. The percussions ``P_back`` and ``P_front`` are contact ordered and each contact tuple consits of (normal percussion, tangential percussion 1, tangential percussion 2).
+
 
 --------------------------
 Licensing
