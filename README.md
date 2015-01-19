@@ -6,9 +6,10 @@ CudaFramework
 Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems
 ----------------------------------------
 
-This source code accompanies the paper "G. Nützi et al. , Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems, 2014"
-The paper can be downloaded here: [Proceeding](http://proceedings.asmedigitalcollection.asme.org/proceeding.aspx?articleID=2091012) or [Homepage](http://www.zfm.ethz.ch/~nuetzig/_private_files/projective.pdf)
-The master thesis can be downloaded [here](http://dx.doi.org/10.3929/ethz-a-010054012) and should be consulted only in the case of being interested in the details of certain GPU variants (see below).
+This source code accompanies the paper   
+*G. Nützi et al. , Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems, 2014*
+[1](http://proceedings.asmedigitalcollection.asme.org/proceeding.aspx?articleID=2091012) or [2](http://www.zfm.ethz.ch/~nuetzig/_private_files/projective.pdf)
+The [master thesis](http://dx.doi.org/10.3929/ethz-a-010054012) should be consulted only in the case of being interested in the details of certain GPU variants (see below).
 
 ---------------------------
 Installation & Dependencies
@@ -16,7 +17,7 @@ Installation & Dependencies
 To build the performance tests (MatrixMultiply, Prox, etc.) you need the built tool [cmake](
 http://www.cmake.org).
 The performance tests only depend on the matrix library [Eigen](http://eigen.tuxfamily.org) at least version 3. Download it and install it on your system.
-You need CUDA installed on your system as well, download the latest CUDA API and Drivers here [Cuda](https://developer.nvidia.com/cuda-downloads).
+You need CUDA installed on your system as well, download and install the latest [CUDA API and Drivers](https://developer.nvidia.com/cuda-downloads).
 
 Download the latest CudaFramework code:
 ```bash
@@ -52,11 +53,13 @@ Example Usage
 ---------------------------
 The performance tests are all written in the same structure. 
 A performance tests of any kind of application can be specified with the ``PerformanceTest`` template class which accepts a test method as template argument.
-For the kernel performance tests mainly used in this project, the test method ``KernelTestMethod`` is of main interest.
-The target PerformanceProx contains the parallel GPU implementation of the projective overrelaxed Jacobi (JORProx) and succesive overrelaxed Gauss-Seidel (SORProx, SORProxRelaxed) algorithms used in multi-body dynamics.
-The target PerformanceMatrix contains the performance test of the efficient parallel matrix-multiplication kernel which is used for the JORProx implementation.
+For the kernel performance tests mainly used in this project, the test method ``KernelTestMethod`` is of main interest.   
 
-The following example shows how a performance test for the SORProx GPU Variant 1 is launched:
+The target ``PerformanceProx`` contains the parallel GPU implementation of the projective overrelaxed Jacobi (JORProx) and succesive overrelaxed Gauss-Seidel (SORProx, SORProxRelaxed) iterations used in multi-body dynamics.
+
+The target ``PerformanceMatrix`` contains the performance test of the efficient parallel matrix-multiplication kernel which is used for the JORProx implementation.
+
+The following example shows how a performance test for the SORProx GPU Variant 1 is launched (target: ``PerformaceProx``):
 ```C++
     typedef KernelTestMethod< /* Specify a kernel test method */ 
     
@@ -96,11 +99,11 @@ The GPU variants for the type ``m_gpuVariant`` of the JORProx and SORProx can be
 These files will help the most in understanding the source code together with the paper.
 
 Each GPU variant class ``JorProxGPUVariant`` and ``SorProxGPUVariant`` contains certain variants which correspond to fixed GPU settings (block dimension, threads per block etc...).
-The descriptions of these variants are consistent with the master thesis and the paper.
-Each GPU variant has a ``initializeTestProblem()`` function which fills the iteration matrices with random values (keeping the problem size fix!).
+The descriptions of these variants are consistent with the master thesis (and hopefully also the paper).
+Each GPU variant has a ``initializeTestProblem()`` function which fills the iteration matrices with random values (keeping the problem size fixed!).
 Each GPU variant also has ``runGPUProfile()`` and ``runGPUPlain()`` functions which launch the GPU variants with or without timing information.
 
-The kernels A and B involved in the GPU variant ``SorProxGPUVariant`` are launched sequentially over matrix ``T_dev``:
+To get to the bottom of the prox iteration variants, consider the the kernels A and B involved in the GPU variant ``SorProxGPUVariant``. These are launched sequentially over the iteration matrix ``T_dev`` as shown in the following:
 
 for(m_nIterGPU=0; m_nIterGPU< m_nMaxIterations ; m_nIterGPU++){
 
