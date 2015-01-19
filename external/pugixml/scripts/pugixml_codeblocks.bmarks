@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<BrowseTracker_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="../src/pugixml.hpp" open="1" top="0" tabpos="16">
+		<Cursor position="0" topLine="75" />
+		<BrowseMarks positions="" />
+		<Book_Marks positions="" />
+	</File>
+	<File name="../src/pugiconfig.hpp" open="1" top="0" tabpos="17">
+		<Cursor position="0" topLine="0" />
+		<BrowseMarks positions="" />
+		<Book_Marks positions="" />
+	</File>
+	<File name="../src/pugixml.cpp" open="1" top="1" tabpos="15">
+		<Cursor position="0" topLine="10611" />
+		<BrowseMarks positions="" />
+		<Book_Marks positions="" />
+	</File>
+</BrowseTracker_layout_file>

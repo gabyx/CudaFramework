@@ -1,0 +1,1 @@
+﻿This is the method "Block Column Gauss-Seidel" (see figure 2.c and 3) from the paper "Parallel Dense Gauss-Seidel Algorithm on Many-Core Processors"

@@ -1,0 +1,3 @@
+﻿Performance Test for Matrix Mulitplication
+
+Lets make a plot which block size and thread dimension gives the best results...
