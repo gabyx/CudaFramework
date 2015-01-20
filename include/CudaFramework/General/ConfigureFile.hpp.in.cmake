@@ -11,9 +11,15 @@
 #define CudaFramework_General_ConfigureFile_hpp_in_cmake
 
 
+namespace CudaFramework{
 
+    static const unsigned int VersionMajor =  @CudaFramework_VERSION_MAJOR@ ;
+    static const unsigned int VersionMinor =  @CudaFramework_VERSION_MINOR@ ;
+    static const unsigned int VersionPatch =  @CudaFramework_VERSION_PATCH@ ;
+    
+}
 
-#define CUDA_VERSION @CUDA_VERSION_INTEGER@
+#define CUDA_VERSION @CUDA_VERSION@
 #define USE_INTEL_BLAS @USE_INTEL_BLAS_FLAG@
 #define BLAS_NUM_THREADS @BLAS_NUM_THREADS@
 #define USE_GOTO_BLAS @USE_GOTO_BLAS_FLAG@

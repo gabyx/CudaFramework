@@ -25,8 +25,8 @@ if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
 endif()
 PROJECT(${PROJECTNAME})
 
-SET(CUDAFRAMEWORK_BINARY_DIR ${PROJECT_BINARY_DIR})
-SET(CUDAFRAMEWORK_ROOT_DIR   ${PROJECT_SOURCE_DIR})
+SET(CudaFramework_BINARY_DIR ${PROJECT_BINARY_DIR})
+SET(CudaFramework_ROOT_DIR   ${PROJECT_SOURCE_DIR})
 
 
 #Add some multithreaded build support =====================================================================================================
@@ -34,7 +34,7 @@ MARK_AS_ADVANCED(MULTITHREADED_BUILD)
 SET(MULTITHREADED_BUILD ON CACHE BOOL "Parallel build with as many threads as possible!")
 if(MULTITHREADED_BUILD)
 	if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
-            file(COPY ${CUDAFRAMEWORK_ROOT_DIR}/cmake/parallelmake.sh DESTINATION ${PROJECT_BINARY_DIR}
+            file(COPY ${CudaFramework_ROOT_DIR}/cmake/parallelmake.sh DESTINATION ${PROJECT_BINARY_DIR}
                 FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
                 NO_SOURCE_PERMISSIONS
             )
@@ -48,10 +48,10 @@ endif()
 # ========================================================================================================================================
 
 MESSAGE(STATUS "Compiler ID is: " ${CMAKE_CXX_COMPILER_ID})
-IF(NOT CUDAFRAMEWORK_SET_COMPILER_FLAGS_INTERNAL)
+IF(NOT CudaFramework_SET_COMPILER_FLAGS_INTERNAL)
 	IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 
-		SET(CUDAFRAMEWORK_SET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
+		SET(CudaFramework_SET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
 		MESSAGE(STATUS "Setting Values for GNU")
 		SET(CMAKE_C_FLAGS "-fmessage-length=0" CACHE STRING "Flags for C Compiler" FORCE)
 		SET(CMAKE_CXX_FLAGS "-std=c++11 -Wno-enum-compare" CACHE STRING "Flags for CXX Compiler" FORCE)
@@ -60,7 +60,7 @@ IF(NOT CUDAFRAMEWORK_SET_COMPILER_FLAGS_INTERNAL)
 	ELSEIF ( ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" )
 
 		MESSAGE(STATUS "Setting Values for Clang")
-		SET(CUDAFRAMEWORK_SET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
+		SET(CudaFramework_SET_COMPILER_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
 		SET(CMAKE_C_FLAGS                "-Wall" CACHE STRING "Flags for C Compiler" FORCE)
 		SET(CMAKE_C_FLAGS_DEBUG          "-g" CACHE STRING "Flags for C Compiler for debug builds" FORCE)
 		SET(CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG" CACHE STRING "Flags for C Compiler for release minsize builds" FORCE)
@@ -89,8 +89,8 @@ ENDIF()
 # Searching CUDA and Flags ======================================================
 FIND_PACKAGE(CUDA REQUIRED)
 
-IF(NOT CUDAFRAMEWORK_SET_COMPILER_CUDA_FLAGS_INTERNAL)
-    SET(CUDAFRAMEWORK_SET_COMPILER_CUDA_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
+IF(NOT CudaFramework_SET_COMPILER_CUDA_FLAGS_INTERNAL)
+    SET(CudaFramework_SET_COMPILER_CUDA_FLAGS_INTERNAL TRUE CACHE INTERNAL "x" FORCE)
     SET(CUDA_VERBOSE_BUILD ON CACHE BOOL "Verbose build" FORCE)
     SET(CUDA_PROPAGATE_HOST_FLAGS OFF CACHE BOOL "Propagate C/CXX Flags and friends to the host compiler in NVCC via -Xompile" FORCE)
 
@@ -134,11 +134,11 @@ set(EIGEN_INCLUDE_DIR ${EIGEN3_INCLUDE_DIR})
 ## ==================================================================================================================
 
 # BLAS VARIANT ====================================================================================================
-SET(CUDAFRAMEWORK_USE_BLAS_VARIANT "NONE" CACHE STRING "Blas Variant either 'INTEL', 'GOTO','OPENBLAS', 'NONE' ")
-MARK_AS_ADVANCED(CUDAFRAMEWORK_USE_BLAS_VARIANT)
-STRING(COMPARE EQUAL ${CUDAFRAMEWORK_USE_BLAS_VARIANT} "GOTO" USE_GOTO_BLAS_FLAG)
-STRING(COMPARE EQUAL ${CUDAFRAMEWORK_USE_BLAS_VARIANT} "OPENBLAS" USE_OPEN_BLAS_FLAG)
-STRING(COMPARE EQUAL ${CUDAFRAMEWORK_USE_BLAS_VARIANT} "INTEL" USE_INTEL_BLAS_FLAG)
+SET(CudaFramework_USE_BLAS_VARIANT "NONE" CACHE STRING "Blas Variant either 'INTEL', 'GOTO','OPENBLAS', 'NONE' ")
+MARK_AS_ADVANCED(CudaFramework_USE_BLAS_VARIANT)
+STRING(COMPARE EQUAL ${CudaFramework_USE_BLAS_VARIANT} "GOTO" USE_GOTO_BLAS_FLAG)
+STRING(COMPARE EQUAL ${CudaFramework_USE_BLAS_VARIANT} "OPENBLAS" USE_OPEN_BLAS_FLAG)
+STRING(COMPARE EQUAL ${CudaFramework_USE_BLAS_VARIANT} "INTEL" USE_INTEL_BLAS_FLAG)
 
 if(USE_INTEL_BLAS_FLAG)
     MESSAGE(FATAL_ERROR "Intel Blas Configuration not yet scripted in cmake")
@@ -167,13 +167,11 @@ SET(CMAKE_DEBUG_POSTFIX "-dbg" CACHE STRING "Debug postfix for library/executabl
 set(COMMON_SOURCE_DIR "${PROJECT_SOURCE_DIR}")
 message(STATUS "CommonSource Dir is set to: ${COMMON_SOURCE_DIR} ")
 
-
-# Configure File ====================
-configure_file (
-  "${COMMON_SOURCE_DIR}/include/CudaFramework/General/ConfigureFile.hpp.in.cmake"
-  "${PROJECT_BINARY_DIR}/include/CudaFramework/General/ConfigureFile.hpp"
-)
-
+# WRITE CONFIGURATION FILE
+INCLUDE(${CudaFramework_ROOT_DIR}/cmake/WriteConfigFile.cmake)
+SET(CudaFramework_CONFIG_FILE ${CudaFramework_BINARY_DIR}/include/CudaFramework/General/ConfigureFile.hpp) 
+CudaFramework_WRITE_CONFIG_FILE( ${CudaFramework_CONFIG_FILE} ${CudaFramework_ROOT_DIR})
+#=========================
 
 # Set common includes for all projects which need them
 INCLUDE(IncludeModulesCudaFramework)
