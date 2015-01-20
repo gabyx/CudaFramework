@@ -52,13 +52,15 @@ It should work for Windows as well, but has not been tested.
 ---------------------------
 Example Usage
 ---------------------------
+The target ``PerformanceProx`` contains the parallel GPU implementation of the projective overrelaxed Jacobi (JORProx) and succesive overrelaxed Gauss-Seidel (SORProx, SORProxRelaxed) iterations used in multi-body dynamics.
+The target ``PerformanceMatrix`` contains the performance test of the efficient parallel matrix-multiplication kernel which is used for the JORProx implementation.
+The target ``GaussSeidelTest`` contains the test launches of the parallel linear Gauss-Seidel algorithm.
+
 The performance tests are all written in the same structure. 
 A performance tests of any kind of application can be specified with the ``PerformanceTest`` template class which accepts a test method as template argument.
-For the kernel performance tests mainly used in this project, the test method ``KernelTestMethod`` is of main interest.   
+For the kernel performance tests mainly used in this project, the test method ``KernelTestMethod`` is of main interest. It is used for profiling/checking a certain GPU implementation (``ProxTestVariant`` see below) against a serial CPU implementation. The results are saved in an XML file, with all information available from the launch 
 
-The target ``PerformanceProx`` contains the parallel GPU implementation of the projective overrelaxed Jacobi (JORProx) and succesive overrelaxed Gauss-Seidel (SORProx, SORProxRelaxed) iterations used in multi-body dynamics.
 
-The target ``PerformanceMatrix`` contains the performance test of the efficient parallel matrix-multiplication kernel which is used for the JORProx implementation.
 
 The following example shows how a performance test for the SORProx GPU Variant 1 is launched (target: ``PerformaceProx``):
 ```C++
