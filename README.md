@@ -87,15 +87,15 @@ The following example shows how a performance test for the SORProx GPU Variant 1
 ```
 
 ### Understanding JORProx and SORProx
-To understand the **JORProx and SORProx, the user is encouraged to understand the workflow of the ``ProxTestVariant`` in ``ProxTestVariant.hpp``.
+To understand the workflow of the performance tests and application of the **JORProx** and **SORProx**, the user is encouraged to understand the basic workflow of the ``ProxTestVariant`` in ``ProxTestVariant.hpp``.
 This class contains the basic initialization of the used matrices for the numerical iterations, the two important functions
 ``ProxTestVariant::runOnGPU()`` and ``ProxTestVariant::runOnCPU()`` which run the specified variant (e.g. SORProx GPU Variant 1 in the above example) 
 on the CPU or the GPU, and a check routine
 ``ProxTestVariant::checkResults()`` which compares the results from the GPU to the CPU.
 The function call ``ProxTestVariant::runOnGPU()`` calls the ``runGPUProfile()`` function of the templated type ``ProxTestVariant::m_gpuVariant``.
 
-The GPU variants for the type ``m_gpuVariant`` of the JORProx and SORProx can be found in ``SorProxGPUVariant.hpp`` and ``JorProxGPUVariant.hpp``. 
-These files will help the most in understanding the source code together with the paper.
+**The GPU variants for the type ``m_gpuVariant`` of the JORProx and SORProx can be found in ``SorProxGPUVariant.hpp`` and ``JorProxGPUVariant.hpp``.** 
+**These files will help the most in understanding the source code together with the paper.**
 
 Each GPU variant class ``JorProxGPUVariant`` and ``SorProxGPUVariant`` contains certain variants which correspond to fixed GPU settings (block dimension, threads per block etc...).
 The descriptions of these variants are consistent with the master thesis (and hopefully also the paper).
