@@ -58,8 +58,7 @@ The target ``GaussSeidelTest`` contains the test launches of the parallel linear
 
 The performance tests are all written in the same structure. 
 A performance tests of any kind of application can be specified with the ``PerformanceTest`` template class which accepts a test method as template argument.
-For the kernel performance tests mainly used in this project, the test method ``KernelTestMethod`` is of main interest. It is used for profiling/checking a certain GPU implementation (``ProxTestVariant`` see below) against a serial CPU implementation. The results are saved in an XML file, with all information available from the launch 
-
+For the kernel performance tests mainly used in this project, the test method ``KernelTestMethod`` is of main interest. It is used for profiling/checking a certain GPU implementation (``ProxTestVariant`` see below) against a serial CPU implementation. The results are saved in an XML file, with all output provided by the test method (e.g.  ``KernelTestMethod``). A python notebook``python/ParseXML.pynb`` is provided as an example to parse the performance tests output XML.
 
 
 The following example shows how a performance test for the SORProx GPU Variant 1 is launched (target: ``PerformaceProx``):
@@ -87,7 +86,7 @@ The following example shows how a performance test for the SORProx GPU Variant 1
         
     > test1;
     
-    PerformanceTest<test1> A("SorProxVariant1D");
+    PerformanceTest<test1> A("SorProxVariant1D"); /* output file written to: SorProxVariant1D***.xml*/
     A.run();
 ```
 
@@ -106,7 +105,7 @@ The descriptions of these variants are consistent with the master thesis (and ho
 Each GPU variant has a ``initializeTestProblem()`` function which fills the iteration matrices with random values (keeping the problem size fixed!).
 Each GPU variant also has ``runGPUProfile()`` and ``runGPUPlain()`` functions which launch the GPU variants with or without timing information.
 
-To get to the bottom of the prox iteration variants, consider the the kernels A and B involved in the GPU variant ``SorProxGPUVariant``. These are launched sequentially over the iteration matrix ``T_dev`` as shown in the following:
+To get to the bottom of the prox iteration variants, consider the the kernels A and B involved in the GPU variant ``SorProxGPUVariant``. This variant is described in the paper in detail. Kernels A and B are launched sequentially over the iteration matrix ``T_dev`` as shown in the following:
 ```C
     for(m_nIterGPU=0; m_nIterGPU< m_nMaxIterations ; m_nIterGPU++){
 
@@ -131,6 +130,7 @@ To get to the bottom of the prox iteration variants, consider the the kernels A 
                   );
 
             }
+    }
 ```
 
 **Interfacing with Own Code:**
@@ -141,8 +141,9 @@ variant types somewhere in your code:
 
    SorProxGPUVariant< SorProxGPUVariantSettingsWrapper<PREC,1,ConvexSets::RPlusAndDisk,true,300,true,10,true,  TemplateHelper::Default >,  ConvexSets::RPlusAndDisk > m_sorGPUVariant;
 ```
+These variants are the fastest methods so far (at least for the NIVIDIA GTX 580), you can try to tweak the settings in ``ProxKernelSettings.hpp`` for the JORProx and SORProx to gain better speeds for your GPU. 
 
-and then launching the iterations with something like this:
+Launching the iterations would look similar to this example:
 
 ```C++
         m_jorGPUVariant.setSettings(m_settings.m_MaxIter,m_settings.m_AbsTol,m_settings.m_RelTol);
@@ -153,7 +154,8 @@ and then launching the iterations with something like this:
         gpuSuccess = m_sorGPUVariant.runGPUPlain(P_front,m_T,P_back,m_d,m_mu);
         m_globalIterationCounter = m_jorGPUVariant.m_nIterGPU;
 ```
-Matrices ``m_T`` and ``m_d`` are built as described in the paper. Vector ``m_mu`` are the friction coefficients for all contacts which consist of a normal and two tangential forces. The percussions ``P_back`` and ``P_front`` are contact ordered and each contact tuple consits of (normal percussion, tangential percussion 1, tangential percussion 2).
+Matrices ``m_T`` and ``m_d`` are built as described in the paper. Vector ``m_mu`` are the friction coefficients for all contacts which consist of a normal and two tangential forces. The percussions ``P_back`` and ``P_front`` are contact ordered and each contact tuple consits of (normal percussion, tangential percussion 1, tangential percussion 2, see the description in the paper).
+
 
 
 --------------------------
