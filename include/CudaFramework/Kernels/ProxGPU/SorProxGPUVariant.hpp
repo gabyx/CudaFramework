@@ -644,7 +644,7 @@ public:
         float time;
         CHECK_CUDA( cudaEventElapsedTime(&time,m_startCopy,m_stopCopy));
         m_elapsedTimeCopyToGPU = time;
-        *m_pLog << " ---> Copy time to GPU:"<< tinyformat::format("%1$8.6f ms" , time) <<std::endl;
+        *m_pLog << " ---> Copy time to GPU:"<< tinyformat::format("%8.6f ms" , time) <<std::endl;
 
 
         *m_pLog << " ---> Iterations started..."<<std::endl;
@@ -668,7 +668,7 @@ public:
         double average = (time/(double)m_nIterGPU);
         m_gpuIterationTime = average;
 
-        *m_pLog << " ---> GPU Iteration time :"<< tinyformat::format("%1$8.6f ms",average) <<std::endl;
+        *m_pLog << " ---> GPU Iteration time :"<< tinyformat::format("%8.6f ms",average) <<std::endl;
         *m_pLog << " ---> nIterations: " << m_nIterGPU <<std::endl;
         if (m_nIterGPU == nMaxIterations) {
             *m_pLog << " ---> Max. Iterations reached."<<std::endl;
@@ -683,7 +683,7 @@ public:
         CHECK_CUDA(cudaEventSynchronize(m_stopCopy));
         CHECK_CUDA( cudaEventElapsedTime(&time,m_startCopy,m_stopCopy));
         m_elapsedTimeCopyFromGPU = time;
-        *m_pLog << " ---> Copy time from GPU:"<< tinyformat::format("%1$8.6f ms", time) <<std::endl;
+        *m_pLog << " ---> Copy time from GPU:"<< tinyformat::format("%8.6f ms", time) <<std::endl;
     }
 
     template<typename Derived1, typename Derived2, typename Derived3>

@@ -301,7 +301,7 @@ public:
 
         m_cpuIterationTime = count*1e-6 / nMaxIterations;
 
-        *m_pLog << " ---> CPU  Iteration time: " <<  tinyformat::format("%1$8.6f ms", m_cpuIterationTime) <<std::endl;
+        *m_pLog << " ---> CPU  Iteration time: " <<  tinyformat::format("%8.6f ms", m_cpuIterationTime) <<std::endl;
         *m_pLog << " ---> nIterations: " << m_nIterCPU <<std::endl;
         if (m_nIterCPU == nMaxIterations) {
             *m_pLog << " ---> Not converged! Max. Iterations reached."<<std::endl;
@@ -346,7 +346,7 @@ public:
     }
 
     void writeData() {
-        tinyformat::format(*m_pData,"%1$.9d\t", m_nContacts);
+        tinyformat::format(*m_pData,"%.9d\t", m_nContacts);
     }
 
     void finalize() {
@@ -540,7 +540,7 @@ public:
         float time;
         CHECK_CUDA( cudaEventElapsedTime(&time,m_startCopy,m_stopCopy));
         m_elapsedTimeCopyToGPU = time;
-        *m_pLog << " ---> Copy time to GPU:"<< tinyformat::format("%1$8.6f ms",time) <<std::endl;
+        *m_pLog << " ---> Copy time to GPU:"<< tinyformat::format("%8.6f ms",time) <<std::endl;
 
 
         *m_pLog << " ---> Iterations started..."<<std::endl;
@@ -563,7 +563,7 @@ public:
         double average = (time/(double)nMaxIterations);
         m_gpuIterationTime = average;
 
-        *m_pLog << " ---> GPU Iteration time :"<< tinyformat::format("%1$8.6f ms",average) <<std::endl;
+        *m_pLog << " ---> GPU Iteration time :"<< tinyformat::format("%8.6f ms",average) <<std::endl;
         *m_pLog << " ---> nIterations: " << m_nIter <<std::endl;
         if (m_nIter == nMaxIterations) {
             *m_pLog << " ---> Max. Iterations reached."<<std::endl;
@@ -577,7 +577,7 @@ public:
         CHECK_CUDA(cudaEventSynchronize(m_stopCopy));
         CHECK_CUDA( cudaEventElapsedTime(&time,m_startCopy,m_stopCopy));
         m_elapsedTimeCopyFromGPU = time;
-        *m_pLog << " ---> Copy time from GPU:"<< tinyformat::format("%1$8.6f ms", time)<<std::endl;
+        *m_pLog << " ---> Copy time from GPU:"<< tinyformat::format("%8.6f ms", time)<<std::endl;
     }
 
     template<int VariantId> inline void runKernel() {

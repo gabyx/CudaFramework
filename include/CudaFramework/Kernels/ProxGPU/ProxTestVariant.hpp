@@ -423,7 +423,7 @@ public:
     }
 
     void writeData() {
-      tinyformat::format(*m_pData ,"%1$.9d\t", m_nContacts);
+      tinyformat::format(*m_pData ,"%.9d\t", m_nContacts);
     }
 
     void finalize() {

@@ -308,7 +308,7 @@ public:
             m_testVariant.writeData();
 
             // Write TestMethod specific columns to file
-            tinyformat::format(m_oData, "%1$.9d\t%2$.9d\t%3$.9d\t%4$.9d\t%5$.9d\t%6$.9d\t%7$.9d\t%8$.9d\t%9$.9d"
+            tinyformat::format(m_oData, "%.9d\t%.9d\t%.9d\t%.9d\t%.9d\t%.9d\t%.9d\t%.9d\t%.9d"
                     , nOps
                     , GFlops
                     , Bandwith
@@ -320,14 +320,14 @@ public:
                     , speedUpFactor);
 
             if(CheckResults) {
-                tinyformat::format(m_oData,"\t%1$.9d\t%2$.9d\t%3$.9d\t%4$.9d"
+                tinyformat::format(m_oData,"\t%.9d\t%.9d\t%.9d\t%.9d"
                         , avgRelTol_Avg
                         , maxRelTol_Avg
                         , avgUlp_Avg
                         , (double)maxUlp_Avg);
                 m_oData<<std::endl;
             } else {
-                tinyformat::format(m_oData,"\t%1$.9d\t%2$.9d\t%3$.9d\t%4$.9d"
+                tinyformat::format(m_oData,"\t%.9d\t%.9d\t%.9d\t%.9d"
                         , -0.0
                         , -0.0
                         , -0.0
