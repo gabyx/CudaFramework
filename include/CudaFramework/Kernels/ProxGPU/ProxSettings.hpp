@@ -21,17 +21,25 @@ struct ProxIterationType{
    struct JOR{};
 };
 
-template<typename _PREC, int _VariantId, typename _ConvexSet, int _alignMatrix, int _nMaxIterations, bool _bAbortIfConverged, int _nCheckConvergedFlag, bool _bMatchCPUToGPU, typename _KernelSettings>
+template<   typename _PREC,
+            unsigned int _VariantId,
+            typename _ConvexSet,
+            bool _alignMatrix,
+            unsigned int _nMaxIterations,
+            bool _bAbortIfConverged,
+            unsigned int _nCheckConvergedFlag,
+            bool _bMatchCPUToGPU,
+            typename _KernelSettings>
 struct SorProxGPUVariantSettingsWrapper{
    typedef  _PREC PREC;
    typedef  _ConvexSet  TConvexSet;
    typedef  _KernelSettings  TKernelSettings;
    static const int VariantId = _VariantId;
    STATIC_ASSERTM(VariantId >0, VARIANT_ID_NEEDS_TO_BE_BIGGER_THAN_ZERO)
-   static const int alignMatrix = _alignMatrix;
-   static const int nMaxIterations = _nMaxIterations;
+   static const unsigned int alignMatrix = _alignMatrix;
+   static const unsigned int nMaxIterations = _nMaxIterations;
    static const bool bAbortIfConverged = _bAbortIfConverged;
-   static const int nCheckConvergedFlag = _nCheckConvergedFlag;
+   static const unsigned int nCheckConvergedFlag = _nCheckConvergedFlag;
    static const bool bMatchCPUToGPU = _bMatchCPUToGPU;
 };
 
@@ -39,24 +47,28 @@ struct SorProxGPUVariantSettingsWrapper{
    typedef typename _TSettings_::PREC PREC; \
    typedef typename _TSettings_::TConvexSet  TConvexSet; \
    typedef typename _TSettings_::TKernelSettings TKernelSettings; \
-   static const int VariantId = _TSettings_::VariantId; \
-   static const int alignMatrix = _TSettings_::alignMatrix; \
-   static const int nMaxIterations = _TSettings_::nMaxIterations; \
+   static const unsigned int VariantId = _TSettings_::VariantId; \
+   static const bool alignMatrix = _TSettings_::alignMatrix; \
+   static const unsigned int nMaxIterations = _TSettings_::nMaxIterations; \
    static const bool bAbortIfConverged = _TSettings_::bAbortIfConverged; \
-   static const int nCheckConvergedFlag = _TSettings_::nCheckConvergedFlag; \
+   static const unsigned int nCheckConvergedFlag = _TSettings_::nCheckConvergedFlag; \
    static const bool bMatchCPUToGPU = _TSettings_::bMatchCPUToGPU; \
 
 
 template<typename TSorProxGPUVariantSettingsWrapper, typename TConvexSet> class SorProxGPUVariant; // Prototype
 
-template<int _VariantId, typename _ConvexSet, bool _alignMatrix, typename _KernelSettings = typename TypeTraitsHelper::Default> // Settings from below
+template<int _VariantId,
+    typename _ConvexSet,
+    bool _alignMatrix,
+    typename _KernelSettings = typename TypeTraitsHelper::Default
+> // Settings from below
 struct SorProxGPUVariantSettings{
    typedef _ConvexSet TConvexSet;
    //STATIC_ASSERT( (TypeTraitsHelper::IsSame<TConvexSet,ConvexSets::RPlusAndDisk>::result))
    typedef char static_assert_failed[ ((TypeTraitsHelper::IsSame<_ConvexSet,ConvexSets::RPlusAndDisk>::result)) ? 1 : -1 ];
    typedef typename ProxIterationType::SOR TProxIterationType;
 
-   template <typename _PREC, int _nMaxIterations, bool _bAbortIfConverged, int _nCheckConvergedFlag, bool _bMatchCPUToGPU> // Settings from above
+   template <typename _PREC, unsigned int _nMaxIterations, bool _bAbortIfConverged, unsigned int _nCheckConvergedFlag, bool _bMatchCPUToGPU> // Settings from above
    struct GPUVariant{
       // TODO Specialize this GPUVariant on all ConvexSets, the class is gonna be so much different, that its worth to specialize the whole class new!
       typedef SorProxGPUVariant< SorProxGPUVariantSettingsWrapper<_PREC, _VariantId, TConvexSet,_alignMatrix,_nMaxIterations,_bAbortIfConverged, _nCheckConvergedFlag,_bMatchCPUToGPU,_KernelSettings>, TConvexSet >  TGPUVariant;
@@ -64,16 +76,25 @@ struct SorProxGPUVariantSettings{
 
 };
 
-template<typename _PREC, int _VariantId, typename _ConvexSet, int _alignMatrix, int _nMaxIterations, bool _bAbortIfConverged, int _nCheckConvergedFlag, bool _bMatchCPUToGPU, typename _KernelSettings>
+template<typename _PREC,
+        unsigned int _VariantId,
+        typename _ConvexSet,
+        bool _alignMatrix,
+        unsigned int _nMaxIterations,
+        bool _bAbortIfConverged,
+        unsigned int _nCheckConvergedFlag,
+        bool _bMatchCPUToGPU,
+        typename _KernelSettings
+>
 struct JorProxGPUVariantSettingsWrapper{
    typedef  _PREC PREC;
    typedef  _ConvexSet  TConvexSet;
    typedef  _KernelSettings  TKernelSettings;
-   static const int VariantId = _VariantId;
-   static const int alignMatrix = _alignMatrix;
-   static const int nMaxIterations = _nMaxIterations;
+   static const unsigned int VariantId = _VariantId;
+   static const bool alignMatrix = _alignMatrix;
+   static const unsigned int nMaxIterations = _nMaxIterations;
    static const bool bAbortIfConverged = _bAbortIfConverged;
-   static const int nCheckConvergedFlag = _nCheckConvergedFlag;
+   static const unsigned int nCheckConvergedFlag = _nCheckConvergedFlag;
    static const bool bMatchCPUToGPU = _bMatchCPUToGPU;
 };
 
@@ -81,11 +102,11 @@ struct JorProxGPUVariantSettingsWrapper{
    typedef typename _TSettings_::PREC PREC; \
    typedef typename _TSettings_::TConvexSet  TConvexSet; \
    typedef typename _TSettings_::TKernelSettings TKernelSettings; \
-   static const int VariantId = _TSettings_::VariantId; \
-   static const int alignMatrix = _TSettings_::alignMatrix; \
-   static const int nMaxIterations = _TSettings_::nMaxIterations; \
+   static const unsigned int VariantId = _TSettings_::VariantId; \
+   static const bool alignMatrix = _TSettings_::alignMatrix; \
+   static const unsigned int nMaxIterations = _TSettings_::nMaxIterations; \
    static const bool bAbortIfConverged = _TSettings_::bAbortIfConverged; \
-   static const int nCheckConvergedFlag = _TSettings_::nCheckConvergedFlag; \
+   static const unsigned int nCheckConvergedFlag = _TSettings_::nCheckConvergedFlag; \
    static const bool bMatchCPUToGPU = _TSettings_::bMatchCPUToGPU;
 
 template<typename TJorProxGPUVariantSettingsWrapper, typename TConvexSet> class JorProxGPUVariant; // Prototype
