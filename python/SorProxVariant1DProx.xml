@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<PerformanceTest type="KernelTest">
+    <Description>
+        <GPUInfos>#==================== DEVICE PROBS FOR DEVICE 0========================
+#  Device Name: GeForce GTX 580
+#  Total Global Memory: 3220766720
+#  Shared Memory/Block: 49152
+#  Registers (32bit)/Block: 32768
+#  Warp Size: 32
+#  Memory Pitch: 2147483647
+#  Max. Threads/Block: 1024
+#  Max. Threads Dim: 1024,1024,64
+#  Max. Grid Size: 65535,65535,65535
+#  Total Const Memory: 65536
+#  Compute Capability: 2,0
+#  Clock Rate: 1544000
+#  Texture Alignment: 512
+#  Devide Overlap: 1
+#  Multiprocessor Count: 16
+#  Kernel Exec. Timeout: 1
+#  Integrated GPU: 0
+#  Can map host memory GPU: 1
+#  Compute Mode: 0
+#  Concurrent Kernels: 1
+#  ECC Enabled: 0
+#  PCI Bus ID: 6
+#  PCI Device: 0
+#  TCC Driver: 0
+#  Async Engine Count: 1
+#  Unified Adressing: 1
+#  Mem. Clock Rate: 2004000
+#  Mem. Bus Width:384
+#  L2 Cache Size: 786432
+#  Max Threads per MultiProcessor: 1536
+#========================================================================
+</GPUInfos>
+        <Remarks>This text should explain the description to remember</Remarks>
+        <ProxIterationType>N17ProxIterationType3SORE</ProxIterationType>
+        <VariantID>1</VariantID>
+        <VariantName>Full SOR</VariantName>
+        <VariantDescription>[Step A][Step B]</VariantDescription>
+        <VariantSettings>[ThdsPerBl A: 96, BlDim A: 96, ProxPkgSize A: 3, ProxPkgs A: 32][ThdsPerBl B: 128, BlDim B: 128, XElemsPerThd B: 1, UnrollBlDotProd B: 6], Matrix T aligned: on</VariantSettings>
+        <MatchCPUGPU>on</MatchCPUGPU>
+        <ConvexSet>N10ConvexSets12RPlusAndDiskE</ConvexSet>
+        <TotalProxIterations>1</TotalProxIterations>
+        <TotalTestProblemsPerContactSize>3</TotalTestProblemsPerContactSize>
+        <Precision>d</Precision>
+    </Description>
+    <DataTable>
+        <Header>
+            <Column>nContacts</Column>
+            <Column>nFlop</Column>
+            <Column>GFlops</Column>
+            <Column>Memory Bandwith [Bytes/sec]</Column>
+            <Column>elapsedTimeCopyToGPU_Avg [s]</Column>
+            <Column>gpuIterationTime_Avg [s]</Column>
+            <Column>elapsedTimeCopyFromGPU_Avg [s]</Column>
+            <Column>cpuIterationTime_Avg [s]</Column>
+            <Column>nIterationsForTradeoff</Column>
+            <Column>speedUpFactor</Column>
+            <Column>maxRelTol_Avg (over all TestProblems)</Column>
+            <Column>avgRelTol_Avg (over all TestProblems)</Column>
+            <Column>maxUlp_Avg (over all TestProblems)</Column>
+            <Column>avgUlp_Avg (over all TestProblems)</Column>
+        </Header>
+        <Data># Kernel Performance Test:  Data Dump for file:SorProxVariant1DProx.xml
+000002000	072018000	12.3771081	5.00487643e+10	0.0905044047	0.00581864516	5.92213348e-05	0.0303910843	3.68557738	5.22305167	5.12996613e-16	6.31490315e-13	3.30811111	000003578
+000002020	073465380	12.1313701	4.90578477e+10	0.0901103261	0.00605581888	3.94773334e-05	0.0273280623	4.23790766	4.5126948	7.16037823e-16	1.79160489e-12	4.67678768	000011605
+000002040	074927160	12.1905832	4.92920553e+10	0.0920140076	0.00614631462	4.45973339e-05	0.027946596	4.22281728	4.54688667	4.08206172e-16	3.73231341e-13	2.58845316	000002112
+</Data>
+    </DataTable>
+</PerformanceTest>
