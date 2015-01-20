@@ -1,6 +1,6 @@
-====
+=
 Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems
-====
+=
 
 This source code accompanies the paper   
 
@@ -45,10 +45,10 @@ Supported Platforms
 The code has been tested on Linux and OS X with compilers ``clang`` and ``gcc``. 
 It should work for Windows as well, but has not been tested.
 
----------------------------
-Example Usage
----------------------------
-The target ``PerformanceProx`` contains the parallel GPU implementation of the projective overrelaxed Jacobi (JORProx) and succesive overrelaxed Gauss-Seidel (SORProx, SORProxRelaxed) iterations used in multi-body dynamics.
+
+##Example Usage
+
+The target ``PerformanceProx`` contains the parallel GPU implementation of the **projective overrelaxed Jacobi (JORProx)** and **succesive overrelaxed Gauss-Seidel (SORProx, SORProxRelaxed)** iterations used in multi-body dynamics.
 The target ``PerformanceMatrix`` contains the performance test of the efficient parallel matrix-multiplication kernel which is used for the JORProx implementation.
 The target ``GaussSeidelTest`` contains the test launches of the parallel linear Gauss-Seidel algorithm.
 
@@ -86,7 +86,8 @@ The following example shows how a performance test for the SORProx GPU Variant 1
     A.run();
 ```
 
-To understand the JORProx and SORProx, the user is encouraged to understand the workflow of the ``ProxTestVariant`` in ``ProxTestVariant.hpp``.
+### Understanding JORProx and SORProx
+To understand the **JORProx and SORProx, the user is encouraged to understand the workflow of the ``ProxTestVariant`` in ``ProxTestVariant.hpp``.
 This class contains the basic initialization of the used matrices for the numerical iterations, the two important functions
 ``ProxTestVariant::runOnGPU()`` and ``ProxTestVariant::runOnCPU()`` which run the specified variant (e.g. SORProx GPU Variant 1 in the above example) 
 on the CPU or the GPU, and a check routine
@@ -129,7 +130,7 @@ To get to the bottom of the prox iteration variants, consider the the kernels A 
     }
 ```
 
-**Interfacing with Own Code:**
+### Interfacing with Own Code
 The best way to use the SORProx or JORProx GPU implementations right out of the box is to instantiate the following
 variant types somewhere in your code:
 ```C++
