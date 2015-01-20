@@ -129,6 +129,7 @@ To get to the bottom of the prox iteration variants, consider the the kernels A 
             }
     }
 ```
+The core of the GPU implementation, namely the kernel functions can be found in the file ``ProxGPU.cu, KernelsProx.cuh`` and with the C++ wrapper calls in ``ProxGPU.hpp``.
 
 ### Interfacing with Own Code
 The best way to use the SORProx or JORProx GPU implementations right out of the box is to instantiate the following
