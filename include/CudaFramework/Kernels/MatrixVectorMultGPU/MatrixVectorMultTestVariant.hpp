@@ -21,7 +21,6 @@
 #include "CudaFramework/General/Utilities.hpp"
 #include "CudaFramework/CudaModern/CudaMatrix.hpp"
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
-#include "CudaFramework/General/GPUDefines.hpp"
 
 #include "CudaFramework/General/FloatingPointType.hpp"
 
@@ -236,8 +235,6 @@ public:
     }
 
     void runOnCPU() {
-        using namespace boost;
-
 
         START_TIMER(start)
         for (m_nIterCPU=0; m_nIterCPU< nMaxIterations ; m_nIterCPU++) {
@@ -248,7 +245,7 @@ public:
 
         m_cpuIterationTime = count*1e-6 / nMaxIterations;
 
-        *m_pLog << "---> CPU  Iteration time: " <<  boost::format("%1$8.6f ms") % (m_cpuIterationTime) <<std::endl;
+        *m_pLog << "---> CPU  Iteration time: " <<  tinyformat::format("%1$8.6f ms",m_cpuIterationTime) <<std::endl;
         *m_pLog << "---> nIterations: " << m_nIterCPU <<std::endl;
 
         m_x_newCPU = m_x_old;
@@ -276,9 +273,7 @@ public:
     }
 
     void writeData() {
-        using namespace boost;
-        *m_pData << boost::format("%1$.9d\t")
-                 % m_nContacts;
+      tinyformat::format(*m_pData,"%1$.9d\t",m_nContacts);
     }
 
     void finalize() {
@@ -461,7 +456,6 @@ public:
     template<typename Derived1, typename Derived2>
     void run(Eigen::MatrixBase<Derived1> & x_newGPU, const Eigen::MatrixBase<Derived2> &T, const Eigen::MatrixBase<Derived1> & x_old, const Eigen::MatrixBase<Derived1> & d) {
 
-        using namespace boost;
 
         //Copy Data
         CHECK_CUDA(cudaEventRecord(m_startCopy,0));
@@ -474,7 +468,7 @@ public:
         float time;
         CHECK_CUDA( cudaEventElapsedTime(&time,m_startCopy,m_stopCopy));
         m_elapsedTimeCopyToGPU = time;
-        *m_pLog << "---> Copy time to GPU:"<< boost::format("%1$8.6f ms") % time <<std::endl;
+        *m_pLog << "---> Copy time to GPU:"<< tinyformat::format("%1$8.6f ms", time) <<std::endl;
 
         m_nIter = 0;
         *m_pLog << "---> Iterations started..."<<std::endl;
@@ -495,7 +489,7 @@ public:
         double average = (time/(double)nMaxIterations);
         m_gpuIterationTime = average;
 
-        *m_pLog << "---> GPU Iteration time :"<< boost::format("%1$8.6f ms") % (average) <<std::endl;
+        *m_pLog << "---> GPU Iteration time :"<< tinyformat::format("%1$8.6f ms",average) <<std::endl;
         *m_pLog << "---> nIterations: " << m_nIter <<std::endl;
         if (m_nIter == nMaxIterations) {
             *m_pLog << "---> Max. Iterations reached."<<std::endl;
@@ -508,7 +502,7 @@ public:
         CHECK_CUDA(cudaEventSynchronize(m_stopCopy));
         CHECK_CUDA( cudaEventElapsedTime(&time,m_startCopy,m_stopCopy));
         m_elapsedTimeCopyFromGPU = time;
-        *m_pLog << "---> Copy time from GPU:"<< boost::format("%1$8.6f ms") % time <<std::endl;
+        *m_pLog << "---> Copy time from GPU:"<< tinyformat::format("%1$8.6f ms",time) <<std::endl;
     }
 
     template<int VariantId> inline void runKernel() {

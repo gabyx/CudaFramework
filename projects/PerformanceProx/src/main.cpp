@@ -305,7 +305,7 @@ int main(int argc, char** argv)
                false,
                10,
                true,
-               ProxPerformanceTestSettings<10,20,10,1>,
+               ProxPerformanceTestSettings<2000,20,2045,3>,
                SorProxGPUVariantSettings<1,ConvexSets::RPlusAndDisk,true>
             >
          >

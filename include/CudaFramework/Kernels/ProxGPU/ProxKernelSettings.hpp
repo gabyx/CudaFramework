@@ -10,9 +10,10 @@
 #ifndef CudaFramework_Kernels_ProxGPU_ProxKernelSettings_hpp
 #define CudaFramework_Kernels_ProxGPU_ProxKernelSettings_hpp
 
+#include <cuda_runtime.h>
 
 #include "CudaFramework/General/StaticAssert.hpp"
-#include "CudaFramework/General/GPUDefines.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
 #include "CudaFramework/General/TypeTraitsHelper.hpp"
 #include "ConvexSets.hpp"
 
@@ -41,6 +42,12 @@ struct JorProxKernelSettings{
 
 
    static const int UnrollBlockDotProduct = _UnrollBlockDotProduct;
+
+
+   static bool checkSettings(int gpuID){
+        return true; /* So far nothing to check at runtime*/
+   };
+
 };
 
 typedef JorProxKernelSettings<128,126,4,ConvexSets::RPlusAndDisk,6> JorProxSettings3RPlusAndDisk;
@@ -86,7 +93,7 @@ public:
    STATIC_ASSERT(BlockDimKernelA % ProxPackageSize == 0)
 
    static const int ThreadsPerBlockKernelA = BlockDimKernelA;
-   STATIC_ASSERT( ThreadsPerBlockKernelA % GPU_WarpSize == 0 )      // ThreadsPerBlock needs to be a multiple of the warp size!
+   // ThreadsPerBlock needs to be a multiple of the warp size! -> runtime check
 
 
    //Kernel B, related parameters!
@@ -94,6 +101,16 @@ public:
    static const int ThreadsPerBlockKernelB = 128;
    static const int XElementsPerThreadKernelB = ((BlockDimKernelA + (ThreadsPerBlockKernelB-1)) / (ThreadsPerBlockKernelB) );
    static const int UnrollBlockDotProductKernelB = 6;
+
+
+   static bool checkSettings(int gpuID){
+        cudaDeviceProp props1;
+
+        CHECK_CUDA(cudaGetDeviceProperties(&props1,gpuID))
+
+        return (SorProxKernelSettings::ThreadsPerBlockKernelA % props1.warpSize == 0);
+
+   }
 
 };
 
@@ -148,7 +165,7 @@ public:
    STATIC_ASSERT( (BlockDimKernelA % (ProxPackageSize*1) == 0) )   // It does not work if we take out "*1" ?? CUDA Compiler BUG?
 
    static const int ThreadsPerBlockKernelA = 128;
-   STATIC_ASSERT( ThreadsPerBlockKernelA % GPU_WarpSize == 0)      // ThreadsPerBlock needs to be a multiple of the warp size!
+   // ThreadsPerBlock needs to be a multiple of the warp size! -> runtime check
 
 
    ////Kernel B, related parameters!
@@ -157,6 +174,13 @@ public:
    static const int XElementsPerThreadKernelB = 4 ;
    static const int UnrollBlockDotProductKernelB = 6;
 
+
+    static bool checkSettings(int gpuID){
+        cudaDeviceProp props1;
+        CHECK_CUDA(cudaGetDeviceProperties(&props1,gpuID));
+
+        return (RelaxedSorProxKernelSettings::ThreadsPerBlockKernelA % props1.warpSize == 0);
+    }
 };
 
 typedef RelaxedSorProxKernelSettings<8,ConvexSets::RPlusAndDisk> RelaxedSorProxSettings1RPlusAndDisk;

@@ -23,7 +23,7 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* 
+*
 *  Source code modified and extended from moderngpu.com
 ******************************************************************************/
 
@@ -48,9 +48,8 @@
 	#define CHECK_CUDA( __term__ ) \
         { \
             cudaError_t __err__ = __term__ ; \
-            if (__err__ != cudaSuccess) { \
+            if ( __err__ != cudaSuccess) { \
                 THROW_CUDA("CUDA ERROR: " <<cudaGetErrorString( __err__ )  , __err__ ); \
-                exit( EXIT_FAILURE ); \
             } \
         }
 
@@ -59,7 +58,6 @@
             cudaError_t __err__ = __term__ ; \
             if (__err__ != cudaSuccess) { \
                 THROW_CUDA( __message__ << " , CUDA ERROR: " <<cudaGetErrorString( __err__ )  , __err__ ); \
-                exit( EXIT_FAILURE ); \
             } \
         }
 
@@ -68,7 +66,6 @@
             cudaError_t __err__ = cudaGetLastError() ; \
             if (__err__ != cudaSuccess) { \
                 THROW_CUDA("CUDA ERROR: " <<cudaGetErrorString( __err__ ) ,  __err__ ); \
-                exit( EXIT_FAILURE ); \
             } \
         }
 
@@ -86,7 +83,6 @@
             cublasStatus_t __err__ = __term__ ; \
             if (__err__ != CUBLAS_STATUS_SUCCESS) { \
                 THROW_CUBLAS( "CUBLAS ERROR: " << __err__   , __err__ ); \
-                exit( EXIT_FAILURE ); \
             } \
         }
 
@@ -108,7 +104,6 @@
             cudaError_t __err__ = __term__ ; \
             if (__err__ != cudaSuccess) { \
                 THROW_CUDA("CUDA ERROR: " <<cudaGetErrorString(__err__ )  , __err__ ); \
-                exit( EXIT_FAILURE ); \
             } \
         }
 
@@ -117,7 +112,6 @@
             cudaError_t __err__ = cudaGetLastError() ; \
             if (__err__ != cudaSuccess) { \
                 THROW_CUDA("CUDA ERROR: " <<cudaGetErrorString( __err__ ) ,  __err__ ); \
-                exit( EXIT_FAILURE ); \
             } \
         }
 

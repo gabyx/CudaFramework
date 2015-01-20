@@ -18,7 +18,6 @@
 #include <time.h>
 
 #include "CudaFramework/General/CPUTimer.hpp"
-#include "CudaFramework/General/GPUDefines.hpp"
 #include "CudaFramework/CudaModern/CudaError.hpp"
 #include "CudaFramework/General/Utilities.hpp"
 #include "CudaFramework/CudaModern/CudaMatrix.hpp"

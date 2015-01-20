@@ -26,7 +26,6 @@
 #include "CudaFramework/General/Utilities.hpp"
 #include "CudaFramework/CudaModern/CudaMatrix.hpp"
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
-#include "CudaFramework/General/GPUDefines.hpp"
 
 #include "ConvexSets.hpp"
 
@@ -110,7 +109,15 @@ struct SeedGenerator {
 };
 
 
-template<typename _PREC, typename _TSeedGenerator, bool _bwriteToFile, int _nMaxIterations, bool _bAbortIfConverged, int _nCheckConvergedFlag, bool _bMatchCPUToGPU,  typename _TPerformanceTestSettings, typename _TGPUVariantSetting >
+template<typename _PREC,
+         typename _TSeedGenerator,
+         bool _bwriteToFile,
+         int _nMaxIterations,
+         bool _bAbortIfConverged,
+         int _nCheckConvergedFlag,
+         bool _bMatchCPUToGPU,
+         typename _TPerformanceTestSettings,
+         typename _TGPUVariantSetting >
 struct ProxSettings {
 
     typedef  _PREC PREC;
@@ -242,8 +249,12 @@ public:
         return s;
     }
 
+    bool checkSettings(unsigned int gpuID){
+        return m_gpuVariant.checkSettings(gpuID);
+    }
 
     bool generateNextTestProblem() {
+
 
 
         if(m_nContactCounter>maxNContacts) {
@@ -412,9 +423,7 @@ public:
     }
 
     void writeData() {
-       using namespace boost;
-       *m_pData << boost::format("%1$.9d\t")
-            % m_nContacts;
+      tinyformat::format(*m_pData ,"%1$.9d\t", m_nContacts);
     }
 
     void finalize() {

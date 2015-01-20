@@ -5,13 +5,14 @@
 #include <iostream>
 #include <time.h>
 
-#include <boost/format.hpp>
+
+#include <cuda_runtime.h>
+#include <tinyformat/TinyFormatInclude.hpp>
 
 #include "CudaFramework/CudaModern/CudaError.hpp"
 #include "CudaFramework/General/Utilities.hpp"
 #include "CudaFramework/CudaModern/CudaUtilities.hpp"
 
-#include <cuda_runtime.h>
 
 using namespace std;
 using namespace Utilities;
@@ -114,7 +115,7 @@ void vectorAddGPU::performanceTestVectorAdd(std::ostream & data, std::ostream & 
 			dim3 blocks(dimGrid);
 
 			// Launch kernel ===========================================================
-			log << "Launch kernel, B:" << boost::format("%1$i,%2$i, T: %3$i,%4$i") % blocks.x % blocks.y % threads.x % threads.y << endl;
+			log << "Launch kernel, B:" << tinyformat::format("%1$i,%2$i, T: %3$i,%4$i",  blocks.x , blocks.y , threads.x , threads.y) << endl;
 			CHECK_CUDA(cudaEventRecord(startKernel,0));
 			for(int nloops = 1; nloops<=maxKernelLoops; nloops++){
 				kernel_ptr(Cdev, Adev, Bdev, MA, threads, blocks);
@@ -130,11 +131,11 @@ void vectorAddGPU::performanceTestVectorAdd(std::ostream & data, std::ostream & 
 			CHECK_CUDA( cudaEventElapsedTime(&elapsedKernelTime,startKernel,stopKernel));
 			double nMillisecs = (double)elapsedKernelTime / (double)maxKernelLoops;
 			double nGFlops = (1e-9* nOps/(nMillisecs/1000.0));
-			log << "GPU Kernel Time :"<< boost::format("%1$8.6f ms") % nMillisecs <<std::endl;
-			log << "GPU Gigaflops : " << boost::format("%1$5.6f Gflops/s , Ops:  %2$f ") % nGFlops % nOps <<std::endl;
+			log << "GPU Kernel Time :"<< tinyformat::format("%1$8.6f ms", nMillisecs) <<std::endl;
+			log << "GPU Gigaflops : " << tinyformat::format("%1$5.6f Gflops/s , Ops:  %2$f ", nGFlops , nOps) <<std::endl;
 
 			// Save to file
-			data << boost::format("%1$.9d\t\t%2$.9d\t\t%3$.9d\t\t%4$.9d\t\t%5$.9d\t\t%6$.9d") % blocks.x % blocks.y % threads.x % threads.y % nMillisecs % nGFlops << endl;
+			data << tinyformat::format("%1$.9d\t\t%2$.9d\t\t%3$.9d\t\t%4$.9d\t\t%5$.9d\t\t%6$.9d", blocks.x , blocks.y, threads.x , threads.y , nMillisecs , nGFlops) << endl;
 		}
 	}
 
@@ -238,7 +239,7 @@ void vectorAddGPU::randomVectorAdd(int kernel = 0){
     dim3 blocks(64);
 
 	// Launch kernel ==================================================================
-   cout << "Launch kernel, B:" << boost::format("%1$i,%2$i, T: %3$i,%4$i") % blocks.x % blocks.y % threads.x % threads.y << endl;
+    cout << "Launch kernel, B:" << tinyformat::format("%1$i,%2$i, T: %3$i,%4$i", blocks.x , blocks.y, threads.x, threads.y) << endl;
 	CHECK_CUDA(cudaEventRecord(startKernel,0));
 	for(int nloops = 1;nloops<=maxKernelLoops;nloops++){
 		kernel_ptr( Cdev, Adev, Bdev, MA, threads, blocks);

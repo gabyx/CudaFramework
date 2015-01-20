@@ -25,8 +25,6 @@
 #include "CudaFramework/CudaModern/CudaMatrix.hpp"
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
-#include "CudaFramework/General/GPUDefines.hpp"
-
 
 
 #if USE_INTEL_BLAS == 1

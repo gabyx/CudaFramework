@@ -14,12 +14,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
-#include <pugixml.hpp>
+#include <vector>
 
 #include <cuda_runtime.h>
 
-#include <boost/format.hpp>
+#include <pugixml/PugiXmlInclude.hpp>
+#include <tinyformat/TinyFormatInclude.hpp>
 
 #include "CudaFramework/General/AssertionDebug.hpp"
 #include "CudaFramework/CudaModern/CudaError.hpp"
@@ -238,7 +238,7 @@ public:
 
     void runTest() {
 
-        using namespace boost;
+        m_testVariant.checkSettings(UseGPUDeviceID);
 
         while(m_testVariant.generateNextTestProblem()) {
 
@@ -308,30 +308,31 @@ public:
             m_testVariant.writeData();
 
             // Write TestMethod specific columns to file
-            m_oData << boost::format("%1$.9d\t%2$.9d\t%3$.9d\t%4$.9d\t%5$.9d\t%6$.9d\t%7$.9d\t%8$.9d\t%9$.9d")
-                    % nOps
-                    % GFlops
-                    % Bandwith
-                    % (elapsedTimeCopyToGPU_Avg*1e-3)
-                    % (gpuIterationTime_Avg*1e-3)
-                    % (elapsedTimeCopyFromGPU_Avg*1e-3)
-                    % (cpuIterationTime_Avg*1e-3)
-                    % nIterationsForTradeoff
-                    % speedUpFactor;
+            tinyformat::format(m_oData, "%1$.9d\t%2$.9d\t%3$.9d\t%4$.9d\t%5$.9d\t%6$.9d\t%7$.9d\t%8$.9d\t%9$.9d"
+                    , nOps
+                    , GFlops
+                    , Bandwith
+                    , (elapsedTimeCopyToGPU_Avg*1e-3)
+                    , (gpuIterationTime_Avg*1e-3)
+                    , (elapsedTimeCopyFromGPU_Avg*1e-3)
+                    , (cpuIterationTime_Avg*1e-3)
+                    , nIterationsForTradeoff
+                    , speedUpFactor);
 
             if(CheckResults) {
-                m_oData << boost::format("\t%1$.9d\t%2$.9d\t%3$.9d\t%4$.9d")
-                        % avgRelTol_Avg
-                        % maxRelTol_Avg
-                        % avgUlp_Avg
-                        % (double)maxUlp_Avg <<std::endl;
+                tinyformat::format(m_oData,"\t%1$.9d\t%2$.9d\t%3$.9d\t%4$.9d"
+                        , avgRelTol_Avg
+                        , maxRelTol_Avg
+                        , avgUlp_Avg
+                        , (double)maxUlp_Avg);
+                m_oData<<std::endl;
             } else {
-                m_oData << boost::format("\t%1$.9d\t%2$.9d\t%3$.9d\t%4$.9d")
-                        % -0.0
-                        % -0.0
-                        % -0.0
-                        % -0.0  <<std::endl;
-                m_oData<< std::endl;
+                tinyformat::format(m_oData,"\t%1$.9d\t%2$.9d\t%3$.9d\t%4$.9d"
+                        , -0.0
+                        , -0.0
+                        , -0.0
+                        , -0.0);
+                m_oData<<std::endl;
             }
 
         }

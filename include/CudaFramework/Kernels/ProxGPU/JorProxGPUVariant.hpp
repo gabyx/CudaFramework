@@ -17,10 +17,11 @@
 #include <time.h>
 #include <algorithm>
 
-//#include <boost/format.hpp>
 #include <Eigen/Dense>
 #include <cuda_runtime.h>
-#include "cublas_v2.h"
+#include <cublas_v2.h>
+
+#include <tinyformat/TinyFormatInclude.hpp>
 
 #include "CudaFramework/General/CPUTimer.hpp"
 #include "CudaFramework/General/StaticAssert.hpp"
@@ -29,14 +30,14 @@
 #include "CudaFramework/General/Utilities.hpp"
 #include "CudaFramework/CudaModern/CudaMatrix.hpp"
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
-#include "CudaFramework/General/GPUDefines.hpp"
 
-#include "ConvexSets.hpp"
 
 #include "CudaFramework/Kernels/ProxGPU/ProxSettings.hpp"
 #include "CudaFramework/Kernels/ProxGPU/ProxGPU.hpp"
 #include "CudaFramework/Kernels/ProxGPU/ProxKernelSettings.hpp"
 
+
+#include "ConvexSets.hpp"
 
 /**
 * @addtogroup ProxTestVariant
@@ -73,6 +74,29 @@ public:
    typedef typename ManualOrDefault<IsEqual<VariantId,3>::result,TKernelSettings,JorProxKernelSettings<128,126,4,TConvexSet,6> >::TValue JorProxSettings3;
 
    typedef typename ManualOrDefault<IsEqual<VariantId,4>::result,TKernelSettings,JorProxKernelSettings<192,192,4,TConvexSet,6> >::TValue JorProxSettings4;
+
+    /** Check settings at runtime, static settings are already checked at compile time*/
+    bool checkSettings(int gpuID){
+    switch(VariantId){
+      case 1:
+         return true;
+      case 2:
+         return true;
+      case 3:
+         return JorProxSettings3::checkSettings(gpuID);
+      case 4:
+         return JorProxSettings4::checkSettings(gpuID);
+      case 5:
+         return true;
+      case 6:
+        return true;
+      case 7:
+        return true;
+      default:
+         ERRORMSG("No settings check specified for variant: " << VariantId << std::endl)
+         return false;
+      }
+   }
 
    static std::string getVariantName(){
        std::stringstream s;
@@ -272,7 +296,7 @@ public:
    template<typename Derived1, typename Derived2,typename Derived3>
    void runCPUEquivalentProfile(Eigen::MatrixBase<Derived1> & x_newCPU, const Eigen::MatrixBase<Derived2> &T, Eigen::MatrixBase<Derived1> & x_old, const Eigen::MatrixBase<Derived1> & d, const Eigen::MatrixBase<Derived3> & mu){
 
-       using namespace boost;
+
       // Do Jor Scheme!
       //TODO platformstl::performance_counter counter;
      START_TIMER(start);
@@ -324,7 +348,7 @@ public:
 
       m_cpuIterationTime = (count*1e-6 / m_nIterCPU);
 
-      *m_pLog << " ---> CPU Sequential Iteration time: " <<  boost::format("%1$8.6f ms") % (m_cpuIterationTime) <<std::endl;
+      *m_pLog << " ---> CPU Sequential Iteration time: " <<  tinyformat::format("%1$8.6f ms",m_cpuIterationTime) <<std::endl;
       *m_pLog << " ---> nIterations: " << m_nIterCPU <<std::endl;
       if (m_nIterCPU == nMaxIterations){
          *m_pLog << " ---> Not converged! Max. Iterations reached."<<std::endl;
@@ -335,7 +359,6 @@ public:
    template<typename Derived1, typename Derived2,typename Derived3>
    void runCPUEquivalentPlain(Eigen::MatrixBase<Derived1> & x_newCPU, const Eigen::MatrixBase<Derived2> &T, Eigen::MatrixBase<Derived1> & x_old, const Eigen::MatrixBase<Derived1> & d, const Eigen::MatrixBase<Derived3> & mu){
 
-      using namespace boost;
       // Do Jor Scheme!
 
       START_TIMER(start);
@@ -380,9 +403,6 @@ public:
       ASSERTMSG(x_old.rows() == d.rows(), "Wrong Dimensions");
       ASSERTMSG(mu.rows() * TConvexSet::Dimension == x_old.rows(), mu.rows() * TConvexSet::Dimension << " , " << x_old.rows() << "Wrong Dimensions" );
 
-      using namespace boost;
-
-
 
       if(VariantId !=7){
          //Copy Data
@@ -397,7 +417,7 @@ public:
          float time;
          CHECK_CUDA( cudaEventElapsedTime(&time,m_startCopy,m_stopCopy));
          m_elapsedTimeCopyToGPU = time;
-         *m_pLog << " ---> Copy time to GPU:"<< boost::format("%1$8.6f ms") % time <<std::endl;
+         *m_pLog << " ---> Copy time to GPU:"<< tinyformat::format("%1$8.6f ms", time)<<std::endl;
 
 
          *m_pLog << " ---> Iterations started..."<<std::endl;
@@ -419,7 +439,7 @@ public:
          CHECK_CUDA( cudaEventElapsedTime(&time,m_startKernel,m_stopKernel));
          m_gpuIterationTime = (time/(double)m_nIterGPU);
 
-         *m_pLog << " ---> GPU Iteration time :"<< boost::format("%1$8.6f ms") % (m_gpuIterationTime) <<std::endl;
+         *m_pLog << " ---> GPU Iteration time :"<< tinyformat::format("%1$8.6f ms",m_gpuIterationTime) <<std::endl;
          *m_pLog << " ---> nIterations: " << m_nIterGPU <<std::endl;
          if (m_nIterGPU == nMaxIterations){
             *m_pLog << " ---> Max. Iterations reached."<<std::endl;
@@ -432,7 +452,7 @@ public:
          CHECK_CUDA(cudaEventSynchronize(m_stopCopy));
          CHECK_CUDA( cudaEventElapsedTime(&time,m_startCopy,m_stopCopy));
          m_elapsedTimeCopyFromGPU = time;
-         *m_pLog << " ---> Copy time from GPU:"<< boost::format("%1$8.6f ms") % time <<std::endl;
+         *m_pLog << " ---> Copy time from GPU:"<< tinyformat::format("%1$8.6f ms", time) <<std::endl;
 
          }
       else{
@@ -445,7 +465,7 @@ public:
           STOP_TIMER_NANOSEC(count,start)
           m_gpuIterationTime = ((count)*1e-6 / nMaxIterations);
 
-          *m_pLog << " ---> CPU Parallel Iteration time :"<< boost::format("%1$8.6f ms") % (m_gpuIterationTime) <<std::endl;
+          *m_pLog << " ---> CPU Parallel Iteration time :"<< tinyformat::format("%1$8.6f ms",m_gpuIterationTime) <<std::endl;
           *m_pLog << " ---> nIterations: " << m_nIterGPU <<std::endl;
            if (m_nIterGPU == nMaxIterations){
               *m_pLog << " ---> Max. Iterations reached."<<std::endl;
@@ -462,7 +482,6 @@ public:
       ASSERTMSG(x_old.rows() == d.rows(), "Wrong Dimensions");
       ASSERTMSG(mu.rows() * TConvexSet::Dimension == x_old.rows(), mu.rows() * TConvexSet::Dimension << " , " << x_old.rows() << "Wrong Dimensions" );
 
-      using namespace boost;
 
 
          //Malloc

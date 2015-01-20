@@ -21,7 +21,7 @@
 #include "CudaFramework/General/Utilities.hpp"
 #include "CudaFramework/CudaModern/CudaMatrix.hpp"
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
-#include "CudaFramework/General/GPUDefines.hpp"
+
 
 #include "CudaFramework/General/FloatingPointType.hpp"
 #include "CudaFramework/General/FlopsCounting.hpp"
@@ -133,6 +133,11 @@ public:
     ~GaussSeidelBlockTestVariant() {
         m_matlab_file.close();
     }
+
+     bool checkSettings(unsigned int gpuID){
+        return m_gpuVariant.checkSettings(gpuID);
+    }
+
 
     void initialize(std::ostream * pLog, std::ostream * pData) {
 
@@ -296,7 +301,7 @@ public:
 
         m_cpuIterationTime = count*1e-6 / nMaxIterations;
 
-        *m_pLog << " ---> CPU  Iteration time: " <<  boost::format("%1$8.6f ms") % (m_cpuIterationTime) <<std::endl;
+        *m_pLog << " ---> CPU  Iteration time: " <<  tinyformat::format("%1$8.6f ms", m_cpuIterationTime) <<std::endl;
         *m_pLog << " ---> nIterations: " << m_nIterCPU <<std::endl;
         if (m_nIterCPU == nMaxIterations) {
             *m_pLog << " ---> Not converged! Max. Iterations reached."<<std::endl;
@@ -341,9 +346,7 @@ public:
     }
 
     void writeData() {
-        using namespace boost;
-        *m_pData << boost::format("%1$.9d\t")
-                 % m_nContacts;
+        tinyformat::format(*m_pData,"%1$.9d\t", m_nContacts);
     }
 
     void finalize() {
@@ -456,6 +459,12 @@ public:
         return getVariantDescriptionInternal<VariantId>() + std::string(", aligned: ") + ((alignMatrix)? std::string("on") : std::string("off"));
     }
 
+
+    bool checkSettings(unsigned int gpuID){
+        return true;
+    }
+
+
     template<int VariantId> static std::string getVariantNameInternal() {
         switch(VariantId) {
         case 1:
@@ -519,8 +528,6 @@ public:
     template<typename Derived1, typename Derived2>
     void run(Eigen::MatrixBase<Derived1> & x_newGPU, Eigen::MatrixBase<Derived1> & t_newGPU,  const Eigen::MatrixBase<Derived2> &T, const Eigen::MatrixBase<Derived1> & x_old, const Eigen::MatrixBase<Derived1> & d, const Eigen::MatrixBase<Derived1> & t) {
 
-        using namespace boost;
-
         //Copy Data
         CHECK_CUDA(cudaEventRecord(m_startCopy,0));
         copyMatrixToDevice(T_dev, T);
@@ -533,7 +540,7 @@ public:
         float time;
         CHECK_CUDA( cudaEventElapsedTime(&time,m_startCopy,m_stopCopy));
         m_elapsedTimeCopyToGPU = time;
-        *m_pLog << " ---> Copy time to GPU:"<< boost::format("%1$8.6f ms") % time <<std::endl;
+        *m_pLog << " ---> Copy time to GPU:"<< tinyformat::format("%1$8.6f ms",time) <<std::endl;
 
 
         *m_pLog << " ---> Iterations started..."<<std::endl;
@@ -556,7 +563,7 @@ public:
         double average = (time/(double)nMaxIterations);
         m_gpuIterationTime = average;
 
-        *m_pLog << " ---> GPU Iteration time :"<< boost::format("%1$8.6f ms") % (average) <<std::endl;
+        *m_pLog << " ---> GPU Iteration time :"<< tinyformat::format("%1$8.6f ms",average) <<std::endl;
         *m_pLog << " ---> nIterations: " << m_nIter <<std::endl;
         if (m_nIter == nMaxIterations) {
             *m_pLog << " ---> Max. Iterations reached."<<std::endl;
@@ -570,7 +577,7 @@ public:
         CHECK_CUDA(cudaEventSynchronize(m_stopCopy));
         CHECK_CUDA( cudaEventElapsedTime(&time,m_startCopy,m_stopCopy));
         m_elapsedTimeCopyFromGPU = time;
-        *m_pLog << " ---> Copy time from GPU:"<< boost::format("%1$8.6f ms") % time <<std::endl;
+        *m_pLog << " ---> Copy time from GPU:"<< tinyformat::format("%1$8.6f ms", time)<<std::endl;
     }
 
     template<int VariantId> inline void runKernel() {

@@ -4,13 +4,15 @@
 #include <stdio.h>
 #include <iostream>
 
-#include <boost/format.hpp>
 #include <Eigen/Dense>
+#include <cuda_runtime.h>
+#include <tinyformat/TinyFormatInclude.hpp>
+
 #include "CudaFramework/CudaModern/CudaError.hpp"
 #include "CudaFramework/General/Utilities.hpp"
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
-#include <cuda_runtime.h>
+
 
 using namespace std;
 using namespace Utilities;
@@ -155,9 +157,9 @@ void matrixMultGPU::randomMatrixMult(int kernel) {
 #if FLOPS_WITH_ASSIGNMENTS == 1
     nOps += MC*NC;
 #endif
-    cout<< boost::format("Kernel Time :  %1$8.6f ms \n") % nMillisecs;
-    cout<< boost::format("GPU Gigaflops :  %1$5.6f Gflops/s , Ops:  %2$f \n") % (1e-9* nOps/(nMillisecs/1000.0)) % nOps;
-    cout<< boost::format("GPU Total Time (malloc,cpy,kernel,cpy): %1$3.6f ms \n") % elapsedTime;
+    cout<< tinyformat::format("Kernel Time :  %1$8.6f ms \n",  nMillisecs);
+    cout<< tinyformat::format("GPU Gigaflops :  %1$5.6f Gflops/s , Ops:  %2$f \n", (1e-9* nOps/(nMillisecs/1000.0)) , nOps);
+    cout<< tinyformat::format("GPU Total Time (malloc,cpy,kernel,cpy): %1$3.6f ms \n", elapsedTime);
 
 
     // PRINT THE CHECK =======================================================
@@ -293,7 +295,7 @@ void matrixMultGPU::performanceTestMatrixMult(std::ostream & data, std::ostream 
             dim3 blocks(dimGrid,dimGrid);
 
             // Launch kernel ===========================================================
-            log << "Launch kernel, B:" << boost::format("%1$i,%2$i, T: %3$i,%4$i") % blocks.x % blocks.y % threads.x % threads.y << endl;
+            log << "Launch kernel, B:" << tinyformat::format("%1$i,%2$i, T: %3$i,%4$i", blocks.x , blocks.y , threads.x , threads.y) << endl;
             //Warmup
             kernel_ptr( Cdev, Adev, Bdev,threads,blocks);
 
@@ -313,11 +315,11 @@ void matrixMultGPU::performanceTestMatrixMult(std::ostream & data, std::ostream 
             CHECK_CUDA( cudaEventElapsedTime(&elapsedKernelTime,startKernel,stopKernel));
             double nMillisecs = (double)elapsedKernelTime / (double)maxKernelLoops;
             double nGFlops = (1e-9* nOps/(nMillisecs/1000.0));
-            log << "GPU Kernel Time :"<< boost::format("%1$8.6f ms") % nMillisecs <<std::endl;
-            log << "GPU Gigaflops : " << boost::format("%1$5.6f Gflops/s , Ops:  %2$f ") % nGFlops % nOps <<std::endl;
+            log << "GPU Kernel Time :"<< tinyformat::format("%1$8.6f ms", nMillisecs) <<std::endl;
+            log << "GPU Gigaflops : " << tinyformat::format("%1$5.6f Gflops/s , Ops:  %2$f ",  nGFlops , nOps) <<std::endl;
 
             // Save to file
-            data << boost::format("%1$.9d\t\t%2$.9d\t\t%3$.9d\t\t%4$.9d\t\t%5$.9d\t\t%6$.9d") % blocks.x % blocks.y % threads.x % threads.y % nMillisecs % nGFlops << endl;
+            data << tinyformat::format("%1$.9d\t\t%2$.9d\t\t%3$.9d\t\t%4$.9d\t\t%5$.9d\t\t%6$.9d" , blocks.x , blocks.y , threads.x , threads.y , nMillisecs,  nGFlops) << endl;
         }
     }
 

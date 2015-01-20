@@ -112,7 +112,8 @@ set(${INC}
     ${COMMON_SOURCE_DIR}/include/CudaFramework/PerformanceTest/PerformanceTest.hpp
     ${COMMON_SOURCE_DIR}/include/CudaFramework/PerformanceTest/KernelTestMethod.hpp
     
-    ${COMMON_SOURCE_DIR}/external/pugixml/src/pugixml.hpp
+    ${COMMON_SOURCE_DIR}/external/pugixml/PugiXmlInclude.hpp
+    ${COMMON_SOURCE_DIR}/external/tinyformat/tinyformat.h
 )
 set(${SRC}
     ${COMMON_SOURCE_DIR}/src/CudaFramework/CudaModern/CudaCompilerVersion.cu
@@ -132,7 +133,7 @@ set(${SRC}
 )
 set(${INCLUDE_DIRS} 
     ${COMMON_SOURCE_DIR}/include/
-    ${COMMON_SOURCE_DIR}/external/pugixml/src/
+    ${COMMON_SOURCE_DIR}/external/
 )
 endmacro(INCLUDE_GENERAL_CUDA)
 
