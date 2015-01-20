@@ -1,10 +1,6 @@
-==========
-CudaFramework
-==========
-
-----------------------------------------
+====
 Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems
-----------------------------------------
+====
 
 This source code accompanies the paper   
 
