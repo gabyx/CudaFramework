@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="GPU JORProx and SORProx : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>GPU JORProx and SORProx</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/gabyx/CudaFramework">View on GitHub</a>
+
+          <h1 id="project_title">GPU JORProx and SORProx</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/gabyx/CudaFramework/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/gabyx/CudaFramework/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1></h1>
+
+<h1>
+<a id="projective-jacobi-and-gauss-seidel-on-the-gpu-for-non-smooth-multi-body-systems" class="anchor" href="#projective-jacobi-and-gauss-seidel-on-the-gpu-for-non-smooth-multi-body-systems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems</h1>
+
+<p>This source code accompanies the paper   </p>
+
+<blockquote>
+<p><strong>G. Nützi et al. , Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems, 2014</strong> , download : <a href="http://proceedings.asmedigitalcollection.asme.org/proceeding.aspx?articleID=2091012">1</a> or <a href="http://www.zfm.ethz.ch/%7Enuetzig/_private_files/projective.pdf">2</a></p>
+</blockquote>
+
+<p>The <a href="http://dx.doi.org/10.3929/ethz-a-010054012">master thesis</a> should be consulted only in the case of being interested in the details of certain GPU variants (see below).</p>
+
+<hr>
+
+<h2>
+<a id="installation--dependencies" class="anchor" href="#installation--dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation &amp; Dependencies</h2>
+
+<p>To build the performance tests (MatrixMultiply, Prox, etc.) you need the built tool <a href="http://www.cmake.org">cmake</a>.
+The performance tests only depend on the matrix library <a href="http://eigen.tuxfamily.org">Eigen</a> at least version 3. Download it and install it on your system.
+You need CUDA installed on your system as well, download and install the latest <a href="https://developer.nvidia.com/cuda-downloads">CUDA API and Drivers</a>.</p>
+
+<p>Download the latest CudaFramework code:</p>
+
+<div class="highlight highlight-bash"><pre>    $ git clone https://github.com/gabyx/CudaFramework.git CudaFramework  </pre></div>
+
+<p>Make a build directory and navigate to it:</p>
+
+<div class="highlight highlight-bash"><pre>    $ mkdir Build
+    $ <span class="pl-s3">cd</span> Build</pre></div>
+
+<p>Invoke cmake in the Build directory:</p>
+
+<div class="highlight highlight-bash"><pre>    $ cmake ../CudaFramework</pre></div>
+
+<p>The cmake script will find Eigen and Cuda if you installed it in a system wide folder (e.g <code>/usr/local/</code>)</p>
+
+<p>Finally, build the performance tests:</p>
+
+<div class="highlight highlight-bash"><pre>    $ make all 
+    $ make install</pre></div>
+
+<p>To build in parallel use the <code>-jN</code> flag in the <code>make</code> commmand, where <code>N</code>denotes the number of parallel threads to use.</p>
+
+<hr>
+
+<h2>
+<a id="supported-platforms" class="anchor" href="#supported-platforms" aria-hidden="true"><span class="octicon octicon-link"></span></a>Supported Platforms</h2>
+
+<p>The code has been tested on Linux and OS X with compilers <code>clang</code> and <code>gcc</code>. 
+It should work for Windows as well, but has not been tested.</p>
+
+<h2>
+<a id="example-usage" class="anchor" href="#example-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example Usage</h2>
+
+<p>The target <code>PerformanceProx</code> contains the parallel GPU implementation of the <strong>projective overrelaxed Jacobi (JORProx)</strong> and <strong>succesive overrelaxed Gauss-Seidel (SORProx, SORProxRelaxed)</strong> iterations used in multi-body dynamics.
+The target <code>PerformanceMatrix</code> contains the performance test of the efficient parallel matrix-multiplication kernel which is used for the JORProx implementation.
+The target <code>GaussSeidelTest</code> contains the test launches of the parallel linear Gauss-Seidel algorithm.</p>
+
+<p>The performance tests are all written in the same structure. 
+A performance tests of any kind of application can be specified with the <code>PerformanceTest</code> template class which accepts a test method as template argument.
+For the kernel performance tests mainly used in this project, the test method <code>KernelTestMethod</code> is of main interest. It is used for profiling/checking a certain GPU implementation (<code>ProxTestVariant</code> see below) against a serial CPU implementation. The results are saved in an XML file, with all output provided by the test method (e.g.  <code>KernelTestMethod</code>). A python notebook<code>python/ParseXML.pynb</code> is provided as an example to parse the performance tests output XML.</p>
+
+<p>The following example shows how a performance test for the SORProx GPU Variant 1 is launched (target: <code>PerformaceProx</code>):</p>
+
+<div class="highlight highlight-C++"><pre>    <span class="pl-st">typedef</span> KernelTestMethod&lt; <span class="pl-c">/* Specify a kernel test method */</span> 
+
+        KernelTestMethodSettings&lt;<span class="pl-c1">false</span>,<span class="pl-c1">true</span>,<span class="pl-c1">0</span>&gt; ,  <span class="pl-c">/* Specify the general kernel test method settings */</span> 
+
+        ProxTestVariant&lt; <span class="pl-c">/* Specify the specific variant of the kernel test method */</span> 
+
+            ProxSettings&lt; <span class="pl-c">/* All settings for the prox test variant */</span> 
+
+               <span class="pl-st">double</span>,                  <span class="pl-c">/* use double floating point precision */</span> 
+               SeedGenerator::<span class="pl-s3">Fixed</span>&lt;<span class="pl-c1">5</span>&gt;, <span class="pl-c">/* the seed for the random value generator for the test data */</span> 
+               <span class="pl-c1">false</span>,                   <span class="pl-c">/* Write the test data to a file (matlab style) */</span> 
+               <span class="pl-c1">1</span>,                       <span class="pl-c">/* Max. iterations of the prox iteration */</span>
+               <span class="pl-c1">false</span>,                   <span class="pl-c">/* Abort iteration if prox iteration converged */</span>
+               <span class="pl-c1">10</span>,                      <span class="pl-c">/* Convergence check every 10 iterations */</span>
+               <span class="pl-c1">true</span>,                    <span class="pl-c">/* Compare the GPU implementation to the exact serial replica on th CPU */</span>
+               ProxPerformanceTestSettings&lt;<span class="pl-c1">3000</span>,<span class="pl-c1">20</span>,<span class="pl-c1">4000</span>,<span class="pl-c1">3</span>&gt;,                <span class="pl-c">/* Problem sizes from 3000 contacts to 4000 in steps of 20, generate 3 random test problems per problem size*/</span>
+               SorProxGPUVariantSettings&lt;<span class="pl-c1">1</span>,ConvexSets::RPlusAndDisk,<span class="pl-c1">true</span>&gt;  <span class="pl-c">/* Use the GPU Variant 1, align the memory on the GPU for coalesced access!*/</span>
+            &gt;
+
+        &gt;
+
+    &gt; test1;
+
+    PerformanceTest&lt;test1&gt; <span class="pl-en">A</span>(<span class="pl-s1"><span class="pl-pds">"</span>SorProxVariant1D<span class="pl-pds">"</span></span>); <span class="pl-c">/* output file written to: SorProxVariant1D***.xml*/</span>
+    A.run();</pre></div>
+
+<h3>
+<a id="understanding-jorprox-and-sorprox" class="anchor" href="#understanding-jorprox-and-sorprox" aria-hidden="true"><span class="octicon octicon-link"></span></a>Understanding JORProx and SORProx</h3>
+
+<p>To understand the workflow of the performance tests and application of the <strong>JORProx</strong> and <strong>SORProx</strong>, the user is encouraged to understand the basic workflow of the <code>ProxTestVariant</code> in <code>ProxTestVariant.hpp</code>.
+This class contains the basic initialization of the used matrices for the numerical iterations, the two important functions
+<code>ProxTestVariant::runOnGPU()</code> and <code>ProxTestVariant::runOnCPU()</code> which run the specified variant (e.g. SORProx GPU Variant 1 in the above example) 
+on the CPU or the GPU, and a check routine
+<code>ProxTestVariant::checkResults()</code> which compares the results from the GPU to the CPU.
+The function call <code>ProxTestVariant::runOnGPU()</code> calls the <code>runGPUProfile()</code> function of the templated type <code>ProxTestVariant::m_gpuVariant</code>.</p>
+
+<p><strong>The GPU variants for the type <code>m_gpuVariant</code> of the JORProx and SORProx can be found in <code>SorProxGPUVariant.hpp</code> and <code>JorProxGPUVariant.hpp</code>.</strong> 
+<strong>These files will help the most in understanding the source code together with the paper.</strong></p>
+
+<p>Each GPU variant class <code>JorProxGPUVariant</code> and <code>SorProxGPUVariant</code> contains certain variants which correspond to fixed GPU settings (block dimension, threads per block etc...).
+The descriptions of these variants are consistent with the master thesis (and hopefully also the paper).
+Each GPU variant has a <code>initializeTestProblem()</code> function which fills the iteration matrices with random values (keeping the problem size fixed!).
+Each GPU variant also has <code>runGPUProfile()</code> and <code>runGPUPlain()</code> functions which launch the GPU variants with or without timing information.</p>
+
+<p>To get to the bottom of the prox iteration variants, consider the the kernels A and B involved in the GPU variant <code>SorProxGPUVariant</code>. This variant is described in the paper in detail. Kernels A and B are launched sequentially over the iteration matrix <code>T_dev</code> as shown in the following:</p>
+
+<div class="highlight highlight-C"><pre>    <span class="pl-k">for</span>(m_nIterGPU=<span class="pl-c1">0</span>; m_nIterGPU&lt; m_nMaxIterations ; m_nIterGPU++){
+
+            <span class="pl-c">// Swap pointers of old and new on the device</span>
+            <span class="pl-s3">std::swap</span>(x_old_dev.<span class="pl-vo">m_pDevice</span>, x_new_dev.<span class="pl-vo">m_pDevice</span>);
+
+            <span class="pl-k">for</span>(<span class="pl-st">int</span> kernelAIdx = <span class="pl-c1">0</span>; kernelAIdx &lt; loops; kernelAIdx++){
+
+               <span class="pl-c">//cudaThreadSynchronize();</span>
+               proxGPU::sorProxContactOrdered_1threads_StepA_kernelWrap&lt;SorProxSettings1&gt;(
+                  mu_dev,x_new_dev,T_dev,d_dev,
+                  t_dev,
+                  kernelAIdx,
+                  pConvergedFlag_dev,
+                  m_absTOL,m_relTOL);
+
+               proxGPU::sorProx_StepB_kernelWrap&lt;SorProxSettings1&gt;(
+                  t_dev,
+                  T_dev,
+                  x_new_dev,
+                  kernelAIdx
+                  );
+
+            }
+    }</pre></div>
+
+<h3>
+<a id="interfacing-with-own-code" class="anchor" href="#interfacing-with-own-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Interfacing with Own Code</h3>
+
+<p>The best way to use the SORProx or JORProx GPU implementations right out of the box is to instantiate the following
+variant types somewhere in your code:</p>
+
+<div class="highlight highlight-C++"><pre>   JorProxGPUVariant&lt; JorProxGPUVariantSettingsWrapper&lt;PREC,<span class="pl-c1">5</span>,ConvexSets::RPlusAndDisk,<span class="pl-c1">true</span>,<span class="pl-c1">1000</span>,<span class="pl-c1">true</span>,<span class="pl-c1">10</span>,<span class="pl-c1">false</span>, TemplateHelper::Default&gt;, ConvexSets::RPlusAndDisk &gt; m_jorGPUVariant;
+
+   SorProxGPUVariant&lt; SorProxGPUVariantSettingsWrapper&lt;PREC,<span class="pl-c1">1</span>,ConvexSets::RPlusAndDisk,<span class="pl-c1">true</span>,<span class="pl-c1">1000</span>,<span class="pl-c1">true</span>,<span class="pl-c1">10</span>,<span class="pl-c1">true</span>,  TemplateHelper::Default &gt;,  ConvexSets::RPlusAndDisk &gt; m_sorGPUVariant;</pre></div>
+
+<p>Please see the the file <code>ProxSettings.hpp</code> for the settings of <code>SorProxGPUVariantSettingsWrapper</code> and <code>JorProxGPUVariantSettingsWrapper</code>, the number 1000 denotes the maximal number of global prox iterations.
+These variants are the fastest methods so far (at least for the NIVIDIA GTX 580), you can try to tweak the settings in <code>ProxKernelSettings.hpp</code> for the JORProx and SORProx to gain better speeds for your GPU. </p>
+
+<p>Launching the iterations would look similar to this example:</p>
+
+<div class="highlight highlight-C++"><pre>        m_jorGPUVariant.setSettings(m_settings.m_MaxIter,m_settings.m_AbsTol,m_settings.m_RelTol);
+        gpuSuccess = m_jorGPUVariant.runGPUPlain(P_front,m_T,P_back,m_d,m_mu);
+        m_globalIterationCounter = m_jorGPUVariant.m_nIterGPU;
+        <span class="pl-c">/* OR */</span>
+        m_sorGPUVariant.setSettings(m_settings.m_MaxIter,m_settings.m_AbsTol,m_settings.m_RelTol);
+        gpuSuccess = m_sorGPUVariant.runGPUPlain(P_front,m_T,P_back,m_d,m_mu);
+        m_globalIterationCounter = m_jorGPUVariant.m_nIterGPU;</pre></div>
+
+<p>Matrices <code>m_T</code> and <code>m_d</code> are built as described in the paper. Vector <code>m_mu</code> are the friction coefficients for all contacts which consist of a normal and two tangential forces. The percussions <code>P_back</code> and <code>P_front</code> are contact ordered and each contact tuple consits of (normal percussion, tangential percussion 1, tangential percussion 2, see the description in the paper).</p>
+
+<hr>
+
+<h2>
+<a id="licensing" class="anchor" href="#licensing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Licensing</h2>
+
+<p>This source code is released under GNU GPL 3.0. </p>
+
+<hr>
+
+<h2>
+<a id="author-and-acknowledgements" class="anchor" href="#author-and-acknowledgements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Author and Acknowledgements</h2>
+
+<p>CudaFramework was written by Gabriel Nützi. Source code from <a href="http://www.moderngpu.com">ModernGPU</a> has been used, see <code>CudaModern</code> folder in <code>/include/CudaFramework</code></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">GPU JORProx and SORProx maintained by <a href="https://github.com/gabyx">gabyx</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
