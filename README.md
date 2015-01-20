@@ -134,10 +134,11 @@ To get to the bottom of the prox iteration variants, consider the the kernels A 
 The best way to use the SORProx or JORProx GPU implementations right out of the box is to instantiate the following
 variant types somewhere in your code:
 ```C++
-   JorProxGPUVariant< JorProxGPUVariantSettingsWrapper<PREC,5,ConvexSets::RPlusAndDisk,true,300,true,10,false, TemplateHelper::Default>, ConvexSets::RPlusAndDisk > m_jorGPUVariant;
+   JorProxGPUVariant< JorProxGPUVariantSettingsWrapper<PREC,5,ConvexSets::RPlusAndDisk,true,1000,true,10,false, TemplateHelper::Default>, ConvexSets::RPlusAndDisk > m_jorGPUVariant;
 
-   SorProxGPUVariant< SorProxGPUVariantSettingsWrapper<PREC,1,ConvexSets::RPlusAndDisk,true,300,true,10,true,  TemplateHelper::Default >,  ConvexSets::RPlusAndDisk > m_sorGPUVariant;
+   SorProxGPUVariant< SorProxGPUVariantSettingsWrapper<PREC,1,ConvexSets::RPlusAndDisk,true,1000,true,10,true,  TemplateHelper::Default >,  ConvexSets::RPlusAndDisk > m_sorGPUVariant;
 ```
+Please see the the file ``ProxSettings.hpp`` for the settings of ``SorProxGPUVariantSettingsWrapper`` and ``JorProxGPUVariantSettingsWrapper``, the number 1000 denotes the maximal number of global prox iterations.
 These variants are the fastest methods so far (at least for the NIVIDIA GTX 580), you can try to tweak the settings in ``ProxKernelSettings.hpp`` for the JORProx and SORProx to gain better speeds for your GPU. 
 
 Launching the iterations would look similar to this example:
