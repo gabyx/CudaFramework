@@ -97,12 +97,11 @@ The function call ``ProxTestVariant::runOnGPU()`` calls the ``runGPUProfile()`` 
 **The GPU variants for the type ``m_gpuVariant`` of the JORProx and SORProx can be found in ``SorProxGPUVariant.hpp`` and ``JorProxGPUVariant.hpp``.** 
 **These files will help the most in understanding the source code together with the paper.**
 
-Each GPU variant class ``JorProxGPUVariant`` and ``SorProxGPUVariant`` contains certain variants which correspond to fixed GPU settings (block dimension, threads per block etc...).
+Each GPU variant class (e.g. ``JorProxGPUVariant``,  ``SorProxGPUVariant``) contains certain variants (ennumerated with ids 1,2,3, ...) which mostly correspond to fixed GPU settings (block dimension, threads per block etc...).
 The descriptions of these variants are consistent with the master thesis (and hopefully also the paper).
-Each GPU variant has a ``initializeTestProblem()`` function which fills the iteration matrices with random values (keeping the problem size fixed!).
-Each GPU variant also has ``runGPUProfile()`` and ``runGPUPlain()`` functions which launch the GPU variants with or without timing information.
+A GPU variant class (e.g. ``JorProxGPUVariant``, ``SorProxGPUVariant``) has a ``initializeTestProblem()`` function which fills the iteration matrices with random values (keeping the problem size fixed!). They also have ``runGPUProfile()`` and ``runGPUPlain()`` functions which run the specified variant id (e.g variant 1 of ``SorProxGPUVariant`` in the example above) with or without timing information.
 
-To get to the bottom of the prox iteration variants, consider the the kernels A and B involved in the GPU variant ``SorProxGPUVariant``. This variant is described in the paper in detail. Kernels A and B are launched sequentially over the iteration matrix ``T_dev`` as shown in the following:
+To get at the bottom of the source code, that means to the prox iteration variants, consider the kernels A and B of all variants in ``SorProxGPUVariant`` (see ``runKernel()`` function). This variant is described in the paper in detail. Kernels A and B are launched sequentially over the iteration matrix ``T_dev`` as shown in the following:
 ```C
     for(m_nIterGPU=0; m_nIterGPU< m_nMaxIterations ; m_nIterGPU++){
 
@@ -129,7 +128,7 @@ To get to the bottom of the prox iteration variants, consider the the kernels A 
             }
     }
 ```
-The core of the GPU implementation, namely the kernel functions can be found in the file ``ProxGPU.cu, KernelsProx.cuh`` and with the C++ wrapper calls in ``ProxGPU.hpp``.
+The core of the GPU kernel implementations can be found in the file ``ProxGPU.cu, KernelsProx.cuh`` and with the C++ wrapper calls in ``ProxGPU.hpp``.
 
 ### Interfacing with Own Code
 The best way to use the SORProx or JORProx GPU implementations right out of the box is to instantiate the following
