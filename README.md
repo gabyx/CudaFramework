@@ -101,7 +101,7 @@ Each GPU variant class (e.g. ``JorProxGPUVariant``,  ``SorProxGPUVariant``) cont
 The descriptions of these variants are consistent with the master thesis (and hopefully also the paper).
 A GPU variant class (e.g. ``JorProxGPUVariant``, ``SorProxGPUVariant``) has a ``initializeTestProblem()`` function which fills the iteration matrices with random values (keeping the problem size fixed!). They also have ``runGPUProfile()`` and ``runGPUPlain()`` functions which run the specified variant id (e.g variant 1 of ``SorProxGPUVariant`` in the example above) with or without timing information.
 
-To get at the bottom of the source code, that means to the prox iteration variants, consider the kernels A and B of all variants in ``SorProxGPUVariant`` (see ``runKernel()`` function). This variant is described in the paper in detail. Kernels A and B are launched sequentially over the iteration matrix ``T_dev`` as shown in the following:
+To get at the bottom of the source code, that means to the actual code of the prox iteration, consider the kernels A and B of all variants in ``SorProxGPUVariant`` (see ``runKernel()`` function). This variant is described in the paper in detail. Kernels A and B are launched sequentially over the iteration matrix ``T_dev`` as shown in the following:
 ```C
     for(m_nIterGPU=0; m_nIterGPU< m_nMaxIterations ; m_nIterGPU++){
 
@@ -138,7 +138,7 @@ variant types somewhere in your code:
 
    SorProxGPUVariant< SorProxGPUVariantSettingsWrapper<PREC,1,ConvexSets::RPlusAndDisk,true,1000,true,10,true,  TemplateHelper::Default >,  ConvexSets::RPlusAndDisk > m_sorGPUVariant;
 ```
-Please see the the file ``ProxSettings.hpp`` for the settings of ``SorProxGPUVariantSettingsWrapper`` and ``JorProxGPUVariantSettingsWrapper``, the number 1000 denotes the maximal number of global prox iterations.
+Please see the file ``ProxSettings.hpp`` for the settings of ``SorProxGPUVariantSettingsWrapper`` and ``JorProxGPUVariantSettingsWrapper``, the number 1000 denotes the maximal number of global prox iterations.
 These variants are the fastest methods so far (at least for the NIVIDIA GTX 580), you can try to tweak the settings in ``ProxKernelSettings.hpp`` for the JORProx and SORProx to gain better speeds for your GPU. 
 
 Launching the iterations would look similar to this example:
