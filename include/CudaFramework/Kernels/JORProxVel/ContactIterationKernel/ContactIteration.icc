@@ -1,0 +1,349 @@
+#ifndef ContactIteration_icc
+#define ContactIteration_icc
+
+#include "Utilities.hpp"
+#include "CudaMatrixUtilities.hpp"
+#include "GenRandomContactGraphClass.hpp"
+#include "GeneralStructs.hpp"
+
+#include "LoadingCPUBuffers.hpp"
+#include "ContactIterationFunc.hpp"
+
+
+
+template<typename TSettings >
+ContIterTestVariant<TSettings>::ContIterTestVariant() {
+
+    m_nContacts=0;
+    m_nContactCounter=0;
+    m_nRandomRunsCounter=0;
+
+    m_numberOfContacts = 0;
+
+}
+
+
+
+
+
+template<typename ContactDataListType ,typename MatrixType>
+void outputcontactiterationCPU(ContactDataListType& contactDataList,MatrixType& m_outputMatrixCPU)
+{
+     unsigned int i=0;
+    for(auto & d : contactDataList) {
+        m_outputMatrixCPU.template block<1,6>(i,0)=d.delta_uBody1;
+        m_outputMatrixCPU.template block<1,6>(i,6)=d.delta_uBody2;
+        m_outputMatrixCPU.template block<1,3>(i,12)=d.lambdaOld;
+        i++;
+    }
+}
+
+template<typename TSettings >
+void ContIterTestVariant<TSettings>::runOnCPU() {
+
+    DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES
+
+    *m_pLog<<"run on CPU"<< std::endl;
+
+    std::vector<BodyData<PREC> > bodyDataList(m_numberOfBodies);
+
+    std::vector<ContactData<PREC> > contactDataList(m_numberOfContacts);
+    ///  Load into storage
+
+
+     LoadingCPUBuffers::loadComplete(m_globalBufferCPU,
+                    m_indexSetCPU,
+                    m_contBufferCPU,
+                    m_bodyBufferCPU,
+                    contactDataList,
+                    bodyDataList);
+
+    /// Start algorithm
+    auto begin = std::chrono::high_resolution_clock::now();
+
+    ContIter::contactiterationCPU<PREC>(contactDataList,bodyDataList);
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    /// load into output buffer
+    outputcontactiterationCPU(contactDataList,m_outputMatrixCPU);
+
+    m_cpuIterationTime = std::chrono::duration<double,std::milli>(end - begin).count();
+    *m_pLog <<"CPU time in ms: "<< m_cpuIterationTime << std::endl;
+};
+
+
+template<typename TSettings >
+bool ContIterTestVariant<TSettings>::isEqual(PREC a,PREC b) {
+    return(std::abs(a-b)<Tolerance);
+}
+
+template<typename TSettings >
+bool ContIterTestVariant<TSettings>::compareOutput() {
+    bool isconverged = true;
+
+
+    for (unsigned int j=0; j< m_implementedLengthOutput; j++) {
+
+        for(unsigned int i=0; i < m_numberOfContacts; i++) {
+            isconverged=isconverged&&isEqual(m_outputMatrixCPU(i,j),m_outputMatrixGPU(i,j));
+
+            if(isconverged==false ) {
+                *m_pLog <<"ERROR not the same results" <<std::endl;
+                *m_pLog <<"Vectornumber row number :  "<<j <<"column number :  "<<i <<std::endl;
+                *m_pLog <<"CPU  "    <<m_outputMatrixCPU(i,j)<<"GPU  "<<m_outputMatrixGPU(i,j)<<std::endl;
+                isconverged=true;
+            }
+        }
+
+
+    }
+    return isconverged;
+}
+
+template<typename TSettings >
+void ContIterTestVariant<TSettings >:: initialize(std::ostream * pLog, std::ostream * pData) {
+
+    m_pData = pData;
+    m_pLog = pLog;
+   *m_pLog <<"initialize "<<std::endl;
+    m_nContactCounter =  ((int)(minNContacts + (stepNContacts -1 ) ) / stepNContacts) * stepNContacts ;
+
+    if(m_nContactCounter <=0) {
+        m_nContactCounter = stepNContacts;
+    }
+
+    m_nRandomRunsCounter =0;
+
+    std::srand ( (unsigned int)time(NULL) );
+
+    m_gpuVariant.initialize(m_pLog);
+
+}
+
+template<typename TSettings >
+bool ContIterTestVariant<TSettings >::generateNextTestProblem() {
+
+    RandomGeneratorType randGen(m_seed);
+    DistributionType distGen(1.0 , 3.0);
+
+    *m_pLog <<"generate next test problem"<<std::endl;
+
+    if(m_nContactCounter>maxNContacts) {
+        *m_pLog << "No more Test Problems to generate, --->exit ============="<<std::endl;
+        return false;
+    }
+
+
+    m_nContacts = m_nContactCounter;
+    *m_pLog << "Compute test for nContacts : "<< m_nContacts <<" ============="<<std::endl;
+
+
+    m_nOps = m_numberOfContacts*3*55;
+
+    //ERRORMSG("DEFINE OPERATION (MULT ADD UND SOWEITER")
+   // m_nBytesReadWrite = 100;
+
+    // Resize matrices CPU memory
+       // REsize matrices CPU memory
+    m_numberOfContacts = m_nContacts;
+    m_numberOfBodies=m_numberOfContacts+1;
+
+    m_numberOfReductions=12*m_numberOfContacts;
+    m_outputMatrixGPU.resize(m_numberOfContacts,m_implementedLengthInput);
+    m_outputMatrixCPU.resize(m_numberOfContacts,m_implementedLengthInput);
+
+
+    /// ===============================================================  ///
+
+    m_bodyBufferGPU.resize((m_numberOfContacts+1),m_bodyBufferLength);
+    m_bodyBufferCPU.resize((m_numberOfContacts+1),m_bodyBufferLength);
+
+    m_contBufferGPU.resize(m_numberOfContacts,m_contactBufferLength);
+    m_contBufferCPU.resize(m_numberOfContacts,m_contactBufferLength);
+
+    m_globalBufferGPU.resize(m_rowsInGlobalBuffer,m_globalBufferLength);
+    m_globalBufferCPU.resize(m_rowsInGlobalBuffer,m_globalBufferLength);
+
+    m_reductionBufferGPU.resize(m_numberOfReductions);
+    m_reductionBufferCPU.resize(m_numberOfReductions);
+
+
+    m_indexSetGPU.resize(m_numberOfContacts,m_indexSetLength);
+    m_indexSetCPU.resize(m_numberOfContacts,m_indexSetLength);
+
+    /// ===============================================================  ///
+
+    m_inputMatrixGPU.resize(m_numberOfContacts,m_implementedLengthInput);
+    m_inputMatrixCPU.resize(m_numberOfContacts,m_implementedLengthInput);
+
+    //reset randomRun
+    m_nRandomRunsCounter = 0;
+
+    m_gpuVariant.initializeTestProblem(m_numberOfContacts,
+
+                                       m_bodyBufferGPU,
+                                       m_contBufferGPU,
+                                       m_globalBufferGPU,
+                                       m_indexSetGPU,
+
+                                       m_outputMatrixGPU);
+    // Increment counter
+    m_nContactCounter += stepNContacts;
+
+    return true;
+}
+
+template<typename TSettings >
+bool ContIterTestVariant<TSettings >::generateNextRandomRun() {
+
+    DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES
+
+    RandomGeneratorType randGen(m_nRandomRunsCounter);
+    DistributionType distGen(4.0 , 6.0);
+
+     *m_pLog<<"generate next random run"<<std::endl;
+    if(m_nRandomRunsCounter < maxNRandomRuns) {
+        m_nRandomRunsCounter++;
+    } else {
+        return false;
+    }
+
+    *m_pLog << "Random Run # : "<<m_nRandomRunsCounter<<std::endl;
+
+    // Set Values! ==============================
+    // Generate a function object (unary function which takes a dummy parameter and return random value)
+    std::function<PREC(PREC)> func = [&](PREC dummy){ return distGen(randGen);};
+    // oder auto func = ....
+
+    m_inputMatrixGPU = m_inputMatrixGPU.array().unaryExpr(func); // hand over this unaray function to eigen unaryExpr(...)
+    m_inputMatrixCPU = m_inputMatrixGPU;
+    // ==========================================
+         ///  ========================================================================  ///
+
+    m_bodyBufferGPU = m_bodyBufferGPU.array().unaryExpr(func); // hand over this unaray function to eigen unaryExpr(...)
+    m_bodyBufferCPU = m_bodyBufferGPU;
+
+    m_contBufferGPU = m_contBufferGPU.array().unaryExpr(func); // hand over this unaray function to eigen unaryExpr(...)
+    m_contBufferCPU = m_contBufferGPU;
+
+    for(int i=0; i< m_reductionBufferGPU.size();i++){
+        m_reductionBufferGPU[i]=i*0.45;
+        m_reductionBufferCPU[i]=i*0.45;
+    }
+
+    for(int z=0; z<m_rowsInGlobalBuffer; z++) {
+        for(int i=0; i<m_globalBufferLength; i++) {
+            m_globalBufferGPU(z,i) = 0 ; // hand over this unaray function to eigen unaryExpr(...)
+        }
+    }
+    ///< not set up  using the contact graph class as the contact rgaph clkass needs a bodyinput and here we only have a certain number of contacts available
+    m_globalBufferCPU=m_globalBufferGPU;
+
+    for(int z=0; z<m_numberOfContacts; z++){
+        m_indexSetGPU(z,I::b1Idx_s)=z;
+        m_indexSetGPU(z,I::b2Idx_s)=z+1;
+
+        m_indexSetGPU(z,I::redIdx_s)=0;
+        m_indexSetGPU(z,I::redIdx_s+1)=0;
+
+        m_indexSetCPU(z,I::b1Idx_s)=z;
+        m_indexSetCPU(z,I::b2Idx_s)=z+1;
+    }
+
+    ///  ========================================================================  ///
+
+    return true;
+}
+
+template<typename TSettings >
+void ContIterTestVariant<TSettings >::checkResults() {
+    if(compareOutput()) {
+       *m_pLog << "Results are Identical"<< std::endl;
+    }
+
+
+    double relTolGPUCPU = 1e-4;
+    unsigned int tolUlpGPUCPU = 2000;
+
+    bool b1,b2,b3,b4;
+    std::tie(b1,b2,b3,b4) = Utilities::compareArraysEachCombined(m_outputMatrixGPU.data(),
+                                 m_outputMatrixCPU.data(),
+                                 m_numberOfContacts*m_implementedLengthOutput,
+                                 relTolGPUCPU,
+                                 tolUlpGPUCPU,
+                                 m_maxRelTol,
+                                 m_avgRelTol,
+                                 m_maxUlp,
+                                 m_avgUlp,
+                                 false);
+
+
+
+    //TODO Eliminate warning???
+    if(b1 && b2 && b3 && b4 ){
+        *m_pLog << " ---> GPU/CPU identical!...." << std::endl;
+    }else{
+        *m_pLog << " ---> GPU/CPU NOT identical!...." << std::endl;
+    }
+        *m_pLog << " ---> Converged relTol: "<<b1  <<" \t Identical Ulp: "<< b2
+                << "      CPU finite: "<<b3  <<" \t GPU finite: "<< b4 << std::endl;
+
+
+
+
+    *m_pLog << " ---> maxUlp: " << (double)m_maxUlp << std::endl;
+    *m_pLog << " ---> avgUlp: " << m_avgUlp << std::endl;
+    *m_pLog << " ---> maxRelTol: " << m_maxRelTol << std::endl;
+    *m_pLog << " ---> avgRelTol: " << m_avgRelTol << std::endl;
+
+}
+
+template<typename TSettings >
+void ContIterTestVariant<TSettings >::writeData() {
+       using namespace boost;
+       *m_pData << boost::format("%1$.9d\t")
+            % m_nContacts;
+}
+
+template<typename TSettings >
+void ContIterTestVariant<TSettings >::runOnGPU() {
+
+
+
+   *m_pLog <<"run on GPU entered"<<std::endl;
+
+
+
+    m_gpuVariant.run(m_numberOfContacts,
+
+                     m_bodyBufferGPU,
+                     m_contBufferGPU,
+                     m_globalBufferGPU,
+                     m_reductionBufferGPU,
+                     m_indexSetGPU,
+
+                     m_outputMatrixGPU);
+
+    m_elapsedTimeCopyToGPU=m_gpuVariant.m_elapsedTimeCopyToGPU;
+    m_elapsedTimeCopyFromGPU=m_gpuVariant.m_elapsedTimeCopyFromGPU;
+    m_gpuIterationTime=m_gpuVariant.m_gpuIterationTime;
+
+}
+
+
+template<typename TSettings >
+void ContIterTestVariant<TSettings >::cleanUpTestProblem() {
+    *m_pLog  <<"Clean up Test Problem"<<std::endl;
+     m_gpuVariant.cleanUpTestProblem();
+
+    m_outputMatrixCPU.resize(0,0);
+    m_inputMatrixCPU.resize(0,0);
+    m_outputMatrixGPU.resize(0,0);
+    m_inputMatrixGPU.resize(0,0);
+}
+
+
+
+
+#endif

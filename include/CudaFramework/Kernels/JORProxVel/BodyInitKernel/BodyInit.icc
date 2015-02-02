@@ -1,0 +1,287 @@
+#ifndef BodyInit_icc
+#define BodyInit_icc
+
+#include <vector>
+
+#include "Utilities.hpp"
+#include "CudaMatrixUtilities.hpp"
+#include "GeneralStructs.hpp"
+#include "BodyInitFunc.hpp"
+
+template<typename TSettings >
+BodyInitTestVariant<TSettings>::BodyInitTestVariant() {
+
+    m_nContacts=0;
+    m_nContactCounter=0;
+    m_nRandomRunsCounter=0;
+    m_numberOfBodies = 0;
+}
+
+template<typename bodyBufferListT,typename EigenMatrix>
+void outputBodyInitCPU(bodyBufferListT& bodyDataList,EigenMatrix& m_outputMatrixCPU) {
+    unsigned int i=0;
+    for(auto & d : bodyDataList) {
+        m_outputMatrixCPU.template block<1,6>(i,0) = d.u;
+        i++;
+    }
+}
+
+
+template<typename TSettings >
+void BodyInitTestVariant<TSettings>::runOnCPU() {
+
+    DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES
+
+    *m_pLog << "run on CPU"<< std::endl;
+
+    std::vector<BodyData<PREC> > bodyDataList(m_numberOfBodies);
+    ///  Load into storage
+    BodyInit::loadBodyInitCPU(bodyDataList,m_bodyBufferCPU,m_globalBufferCPU);
+
+    /// Calculations main algorithm
+
+    auto begin = std::chrono::high_resolution_clock::now();
+    BodyInit::calcBodyInitCPU(bodyDataList);
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    /// Write back into CPU array
+    outputBodyInitCPU(bodyDataList,m_outputMatrixCPU);
+
+    /// Write the measured time into the log
+
+     m_cpuIterationTime = std::chrono::duration<double,std::milli>(end - begin).count();
+     *m_pLog << "CPU time in ms: "<< m_cpuIterationTime << std::endl;
+
+};
+
+template<typename TSettings >
+bool BodyInitTestVariant<TSettings>::isEqual(PREC a,PREC b) {
+    return(std::abs(std::abs(a)-std::abs(b))<Tolerance);
+}
+
+template<typename TSettings >
+bool BodyInitTestVariant<TSettings>::compareOutput() {
+    bool isconverged = true;
+
+
+    for (unsigned int j=0; j< m_implementedLengthOutput; j++) {
+
+        for(unsigned int i=0; i < m_numberOfBodies; i++) {
+            isconverged=isconverged&&isEqual(m_outputMatrixCPU(i,j),m_outputMatrixGPU(i,j));
+
+            if(isconverged==false) {
+                 *m_pLog << "ERROR not the same results" <<std::endl;
+                 *m_pLog << "Vectornumber row number :  "<<j <<"column number :  "<<i <<std::endl;
+                 *m_pLog << "CPU  "    <<m_outputMatrixCPU(i,j)<<"GPU  "<<m_outputMatrixGPU(i,j)<<std::endl;
+            }
+        }
+
+
+    }
+    return isconverged;
+}
+
+template<typename TSettings >
+void BodyInitTestVariant<TSettings >:: initialize(std::ostream * pLog, std::ostream * pData) {
+
+    m_pData = pData;
+    m_pLog = pLog;
+    std::cout<<"initialize "<<std::endl;
+    m_nContactCounter =  ((int)(minNContacts + (stepNContacts -1 ) ) / stepNContacts) * stepNContacts ;
+
+    if(m_nContactCounter <=0) {
+        m_nContactCounter = stepNContacts;
+    }
+
+    m_nRandomRunsCounter =0;
+
+    std::srand ( (unsigned int)time(NULL) );
+
+    m_gpuVariant.initialize(m_pLog);
+
+}
+
+template<typename TSettings >
+bool BodyInitTestVariant<TSettings >::generateNextTestProblem() {
+
+    RandomGeneratorType randGen(m_nRandomRunsCounter);
+    DistributionType distGen(1.0 , 3.0);
+
+    //reset randomRun
+    m_nRandomRunsCounter = 0;
+
+     *m_pLog <<"generate next test problem"<<std::endl;
+
+    if(m_nContactCounter>maxNContacts) {
+        *m_pLog << "No more Test Problems to generate, --->exit ============="<<std::endl;
+        return false;
+    }
+
+
+    m_nContacts = m_nContactCounter;
+    *m_pLog << "Compute test for nContacts: "<< m_nContacts <<" ============="<<std::endl;
+
+
+    m_nOps = m_numberOfBodies*3*55;
+
+    // REsize matrices CPU memory
+
+    m_numberOfContacts=m_nContacts-1;
+    m_numberOfBodies=m_nContacts;
+
+    m_outputMatrixGPU.resize(m_numberOfBodies,m_implementedLengthOutput);
+    m_outputMatrixCPU.resize(m_numberOfBodies,m_implementedLengthOutput);
+
+    /// ===============================================================  ///
+
+    m_bodyBufferGPU.resize(m_numberOfBodies,bodyBufferLength);
+    m_bodyBufferCPU.resize(m_numberOfBodies,bodyBufferLength);
+
+    m_contBufferGPU.resize(m_numberOfContacts,contactBufferLength);
+    m_contBufferCPU.resize(m_numberOfContacts,contactBufferLength);
+
+    m_globalBufferGPU.resize(m_rowsInGlobalBuffer,GlobalBufferOffsetsLength);
+    m_globalBufferCPU.resize(m_rowsInGlobalBuffer,GlobalBufferOffsetsLength);
+
+    m_reductionBufferGPU.resize(m_numberOfReductions,redBufferLength);
+    m_reductionBufferCPU.resize(m_numberOfReductions,redBufferLength);
+
+    /// ===============================================================  ///
+
+    *m_pLog << "Initialize TestProblem GPU "<<std::endl;
+
+
+    std::cout << "labla" <<std::endl;
+
+    m_gpuVariant.initializeTestProblem(m_bodyBufferGPU,
+                                       m_globalBufferGPU,
+                                       m_outputMatrixGPU);
+    // Increment counter
+    m_nContactCounter += stepNContacts;
+
+    return true;
+}
+
+template<typename TSettings >
+bool BodyInitTestVariant<TSettings >::generateNextRandomRun() {
+
+    RandomGeneratorType randGen(m_nRandomRunsCounter);
+    DistributionType distGen(1.0 , 3.0);
+    DistributionTypeuInt intDistGen(1 , 2);
+
+     *m_pLog<<"generate next random run"<<std::endl;
+    if(m_nRandomRunsCounter < maxNRandomRuns) {
+        m_nRandomRunsCounter++;
+    } else {
+        return false;
+    }
+
+    *m_pLog << "Random Run # : "<<m_nRandomRunsCounter<<std::endl;
+
+    // Set Values! ==============================
+    // Generate a function object (unary function which takes a dummy parameter and return random value)
+    std::function<PREC(PREC)> func = [&](PREC dummy){ return distGen(randGen);};
+    std::function<unsigned int(unsigned int)> funcInt = [&](unsigned int dummy){ return intDistGen(randGen);};
+
+     ///  ========================================================================  ///
+
+     m_bodyBufferGPU = m_bodyBufferGPU.array().unaryExpr(func); // hand over this unaray function to eigen unaryExpr(...)
+    m_bodyBufferCPU = m_bodyBufferGPU;
+
+     m_contBufferGPU = m_contBufferGPU.array().unaryExpr(func); // hand over this unaray function to eigen unaryExpr(...)
+    m_contBufferCPU = m_contBufferGPU;
+
+     m_globalBufferGPU = m_globalBufferGPU.array().unaryExpr(funcInt); // hand over this unaray function to eigen unaryExpr(...)
+    m_globalBufferCPU = m_globalBufferGPU;
+
+     m_reductionBufferGPU = m_reductionBufferGPU.array().unaryExpr(func); // hand over this unaray function to eigen unaryExpr(...)
+    m_reductionBufferCPU = m_reductionBufferGPU;
+
+    ///  ========================================================================  ///
+
+    // ==========================================
+
+    return true;
+}
+
+template<typename TSettings >
+void BodyInitTestVariant<TSettings >::checkResults() {
+    if(compareOutput()) {
+         *m_pLog <<  "Results are Identical"<< std::endl;
+    }
+
+
+    double relTolGPUCPU = 1e-5;
+    unsigned int tolUlpGPUCPU = 200;
+
+    bool b1,b2,b3,b4;
+    std::tie(b1,b2,b3,b4) = Utilities::compareArraysEachCombined(    m_outputMatrixGPU.data(),
+                                                                     m_outputMatrixCPU.data(),
+                                                                     m_numberOfBodies*m_implementedLengthOutput,
+                                                                     relTolGPUCPU,
+                                                                     tolUlpGPUCPU,
+                                                                     m_maxRelTol,
+                                                                     m_avgRelTol,
+                                                                     m_maxUlp,
+                                                                     m_avgUlp,
+                                                                     false);
+
+
+
+    if(b1 && b2 && b3 && b4 ){
+        *m_pLog << " ---> GPU/CPU identical!...." << std::endl;
+    }else{
+        *m_pLog << " ---> GPU/CPU NOT identical!...." << std::endl;
+    }
+        *m_pLog << " ---> Converged relTol: "<<b1  <<" \t Identical Ulp: "<< b2
+                << "      CPU finite: "<<b3  <<" \t GPU finite: "<< b4 << std::endl;
+
+
+
+
+    *m_pLog << " ---> maxUlp: " << (double)m_maxUlp << std::endl;
+    *m_pLog << " ---> avgUlp: " << m_avgUlp << std::endl;
+    *m_pLog << " ---> maxRelTol: " << m_maxRelTol << std::endl;
+    *m_pLog << " ---> avgRelTol: " << m_avgRelTol << std::endl;
+
+}
+
+template<typename TSettings >
+void BodyInitTestVariant<TSettings >::writeData() {
+       using namespace boost;
+       *m_pData << boost::format("%1$.9d\t")
+            % m_nContacts;
+}
+
+template<typename TSettings >
+void BodyInitTestVariant<TSettings >::runOnGPU() {
+
+
+
+     *m_pLog << "run on GPU entered"<<std::endl;
+
+
+
+    m_gpuVariant.run(    m_numberOfBodies,
+                         m_bodyBufferGPU,
+                         m_globalBufferGPU,
+                         m_outputMatrixGPU);
+
+    m_elapsedTimeCopyToGPU=m_gpuVariant.m_elapsedTimeCopyToGPU;
+    m_elapsedTimeCopyFromGPU=m_gpuVariant.m_elapsedTimeCopyFromGPU;
+    m_gpuIterationTime=m_gpuVariant.m_gpuIterationTime;
+
+}
+
+template<typename TSettings >
+void BodyInitTestVariant<TSettings >::cleanUpTestProblem() {
+     *m_pLog << "Cleanup"<<std::endl;
+
+     m_gpuVariant.cleanUpTestProblem();
+}
+
+
+
+
+#endif

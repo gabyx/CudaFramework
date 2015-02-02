@@ -178,12 +178,24 @@ INCLUDE(IncludeModulesCudaFramework)
 
 INCLUDE_GENERAL_CUDA(GeneralCommonFiles_SRC GeneralCommonFiles_INC GeneralCommonFiles_INC_DIRS ${COMMON_SOURCE_DIR})
 
+# Gauss Seidel Implementation
 INCLUDE_GAUSS_SEIDEL_CUDA(GaussSeidelGPU_SRC GaussSeidelGPU_INC GaussSeidelGPU_INC_DIRS ${COMMON_SOURCE_DIR})
+# ProxIteration Implementation
 INCLUDE_PROX_CUDA(ProxGPU_SRC ProxGPU_INC ProxGPU_INC_DIRS ${COMMON_SOURCE_DIR})
+
 INCLUDE_VECTOR_ADD_CUDA(VectorAddGPU_SRC VectorAddGPU_INC VectorAddGPU_INC_DIRS ${COMMON_SOURCE_DIR})
 INCLUDE_MATRIX_MULT_CUDA(MatrixMultGPU_SRC MatrixMultGPU_INC MatrixMultGPU_INC_DIRS ${COMMON_SOURCE_DIR})
 INCLUDE_MATRIX_VECTOR_MULT_CUDA(MatrixVectorMultGPU_SRC MatrixVectorMultGPU_INC MatrixVectorMultGPU_INC_DIRS ${COMMON_SOURCE_DIR})
 INCLUDE_TESTS_CUDA(TestsGPU_SRC TestsGPU_INC TestsGPU_INC_DIRS ${COMMON_SOURCE_DIR})
+
+#JorProxVelocity Implementation
+INCLUDE_JOR_PROX_VEL_COMMONS_CUDA(JORProxVelCommon_SRC JORProxVelCommon_INC JORProxVelCommon_INCLUDE_DIRS ${COMMON_SOURCE_DIR} )
+INCLUDE_BODY_INIT_KERNEL_CUDA(BodyInitKernel_SRC BodyInitKernel_INC BodyInitKernel_INCLUDE_DIR ${COMMON_SOURCE_DIR} )
+INCLUDE_CONTACT_INIT_KERNEL_CUDA(ContactInitKernel_SRC ContactInitKernel_INC ContactInitKernel_INCLUDE_DIR ${COMMON_SOURCE_DIR} )
+INCLUDE_REDUCTION_KERNEL_CUDA(ReductionKernel_SRC ReductionKernel_INC ReductionKernel_INCLUDE_DIR ${COMMON_SOURCE_DIR} )
+INCLUDE_JOR_PROX_VEL_KERNEL_CUDA(JORProxVelKernel_SRC JORProxVelKernel_INC JORProxVelKernel_INCLUDE_DIR ${COMMON_SOURCE_DIR} )
+INCLUDE_CONVERGENCE_CHECK_KERNEL_CUDA(ConvergenceCheckKernel_SRC ConvergenceCheckKernel_INC ConvergenceCheckKernel_INCLUDE_DIR ${COMMON_SOURCE_DIR} )
+INCLUDE_CONTACT_ITERATION_KERNEL_CUDA(ContactIterationKernel_SRC ContactIterationKernel_INC ContactIterationKernel_INCLUDE_DIR ${COMMON_SOURCE_DIR} )
 
 
 set(COMMON_FILES_INC
@@ -207,13 +219,18 @@ set(COMMON_INCLUDE_DIR
 
 # =============================================================================================================
 
+#General Tests
 add_subdirectory(projects/TestCudaModern)
 add_subdirectory(projects/TestIntrusivePtr)
 add_subdirectory(projects/TestTemplateKernel)
 add_subdirectory(projects/TestMatrix)
 #add_subdirectory(TestMatrixSDK)
 add_subdirectory(projects/TestGaussSeidel)
+
+#Performance Tests
 add_subdirectory(projects/PerformanceMatrix)
 add_subdirectory(projects/PerformanceVector)
+
 add_subdirectory(projects/PerformanceProx)
 
+add_subdirectory(projects/PerformanceJorProxVel)

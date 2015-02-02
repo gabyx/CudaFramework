@@ -1,13 +1,5 @@
-// ========================================================================================
-//  CudaFramework
-//  Copyright (C) 2014 by Gabriel Nützi <nuetzig (at) imes (d0t) mavt (d0t) ethz (d0t) ch>
-//
-//  This Source Code Form is subject to the terms of the GNU GPL 3.0 licence. 
-//  If a copy of the GNU GPL 3.0 was not distributed with this
-//  file, you can obtain one at http://opensource.org/licenses/GPL-3.0.
-// ========================================================================================
-#ifndef CudaFramework_Kernels_JORProxVel_JORProxVelocityGPUModule_hpp
-#define CudaFramework_Kernels_JORProxVel_JORProxVelocityGPUModule_hpp
+#ifndef JORProxVelocityGPUModule_hpp
+#define JORProxVelocityGPUModule_hpp
 
 #include <vector>
 #include <unordered_map>
@@ -16,10 +8,11 @@
 #include "LogDefines.hpp"
 
 #include "CollisionData.hpp"
-#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
-#include "CudaFramework/Kernels/JORProxVel/GPUBufferLoadStore.hpp"
+#include "GPUBufferLoadStore.hpp"
 
 #include "ContactGraphNodeData.hpp"
+
+#include "JORProxVelGPU.hpp"
 
 
 class JorProxVelocityGPUModule{
@@ -27,6 +20,7 @@ private:
 
     DEFINE_DYNAMICSSYTEM_CONFIG_TYPES
 
+    JORProxVelGPUVariant<PREC,5> m_gpuVariant;
 
     unsigned int m_nContactsInGraph = 0;
     unsigned int m_nSimBodiesInGraph = 0;
@@ -36,7 +30,6 @@ private:
     * @{
     */
     using MatrixUIntType = typename MyMatrix<unsigned int>::MatrixDynDyn;
-    //TODO change vector sized data to MyMatrix<unsigned int>::::VectorDyn
 
     MatrixDynDyn  m_bodyBuffer;       ///< the body buffer
     MatrixDynDyn  m_contBuffer;       ///< the contact buffer
@@ -44,7 +37,7 @@ private:
     MatrixUIntType m_indexBuffer;     ///< the index buffer
     MatrixUIntType m_reductionBuffer; ///< the reduction buffer (only for debug)
 
-    using VectorUIntType = typename MyMatrix<unsigned int>::VectorDyn;
+    using VectorUIntType = typename MyMatrix<int>::VectorDyn;
     VectorUIntType m_csrReductionBuffer;
     unsigned int m_redBufferLength;
 
@@ -61,11 +54,16 @@ private:
 
 public:
 
-    JorProxVelocityGPUModule(){}
+    JorProxVelocityGPUModule(){
+        m_gpuVariant.initialize();
+    }
     ~JorProxVelocityGPUModule(){}
 
     void initializeLog( Logging::Log * pSolverLog){
         m_pSolverLog = pSolverLog;
+
+
+        m_gpuVariant.initializeLog(&std::cout);
     };
 
     /** General reset function which cleans GPUVariant stuff and other data structures in this class*/
@@ -80,6 +78,7 @@ public:
     bool computeOnGPU(unsigned int nContactsInGraph, unsigned int nSimBodiesInGraph){
         //TODO
         // decide with these two values if GPU should be used!
+        /** GPU IS BETTER FOR ALMOST THE COMPLETE CONTACT RANGE \ cite{Thierry2014}  ;) **/
         return true;
     }
 
@@ -89,9 +88,17 @@ public:
     template<typename TContactNodeList, typename TBodyToContactNodeMap>
     bool runOnGPU(const TContactNodeList & contactDataList,
                     const TBodyToContactNodeMap & bodyToNodes,
-                    PREC alphaProx ){
+                    unsigned int minIterations,
+                    unsigned int maxIterations,
+                    PREC absTol,
+                    PREC relTol,
+                    PREC alphaProx,
+                    PREC deltaT,
+                    unsigned int &iterationNumber){
 
-        LOG(m_pSolverLog,"---> JORProxVelGPUModule: GPU run started ... "<< std::endl; )
+
+
+        LOGSLLEVEL1(m_pSolverLog,"---> JORProxVelGPUModule: GPU run started ... "<< std::endl; )
         m_nContactsInGraph = contactDataList.size();
         m_nSimBodiesInGraph = bodyToNodes.size();
 
@@ -105,6 +112,8 @@ public:
         m_csrReductionBuffer.resize(m_nSimBodiesInGraph);
         m_indexBuffer.resize(m_nContactsInGraph,indexBufferLength);
 
+        LOGSLLEVEL1(m_pSolverLog,"---> Init Buffers"<< std::endl; )
+
         JORProxVelGPU::initializeBuffers(m_globalBuffer,
                                          m_indexBuffer,
                                          m_contBuffer,
@@ -117,23 +126,33 @@ public:
 
 
         // Print reduction buffer
-        //TODO (MAKE LOGLEVEL1 macro)
-        LOG(m_pSolverLog,"---> Reduction Buffer Size [in length of u]: " << m_redBufferLength << std::endl; )
-        LOG(m_pSolverLog,"---> Reduction Buffer CSR: " << m_csrReductionBuffer.transpose() << std::endl; )
-
-        //Resize Reduction buffer (only for load back, debug)
-        m_reductionBuffer.resize(1,redBufferLength);
+        LOGSLLEVEL2(m_pSolverLog,"---> Reduction Buffer Size [in length of u]: " << m_redBufferLength << std::endl; )
+        LOGSLLEVEL2(m_pSolverLog,"---> Reduction Buffer CSR: " << m_csrReductionBuffer.transpose() << std::endl; )
 
 
-        // Run the GPU Code (copy, launch kernels, load back)
+            // Run the GPU Code (copy, launch kernels, load back)
+            // initialize -> gpu memory
+            m_gpuVariant.initializeCompleteTestProblem(m_redBufferLength,m_bodyBuffer,m_contBuffer,m_globalBuffer,m_indexBuffer);
+            m_gpuVariant.runJORcomplete2(m_bodyBuffer,
+                                        m_contBuffer,
+                                        m_globalBuffer,
+                                        m_indexBuffer,
+                                        m_csrReductionBuffer,
+                                        minIterations,
+                                        maxIterations,
+                                        deltaT,
+                                        relTol,
+                                        absTol,
+                                        m_redBufferLength
+                                        );
 
-        // TODO (use the instantiated (not here) GPUVariant class to launch the kernel wrapper with the CudaContext)
+        m_gpuVariant.cleanUpTestProblem();
 
-        // Apply all velocities to the bodies
-        //TODO The last number determines which body velocity buffer should be applied
-        LOG(m_pSolverLog,"---> Apply body buffer ... "<< std::endl; )
+        iterationNumber=m_gpuVariant.getLastIterationCount();
+
+        LOGSLLEVEL2(m_pSolverLog,"---> Apply body buffer ... "<< std::endl; )
         JORProxVelGPU::applyBodyBuffer(m_bodyBuffer,bodyToNodes,0);
-        LOG(m_pSolverLog,"---> JORProxVelGPUModule: GPU run finished!"<< std::endl; )
+        LOGSLLEVEL1(m_pSolverLog,"---> JORProxVelGPUModule: GPU run finished!"<< std::endl; )
     }
 
 

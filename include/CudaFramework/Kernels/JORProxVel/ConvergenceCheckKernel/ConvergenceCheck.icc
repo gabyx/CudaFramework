@@ -1,0 +1,330 @@
+#ifndef ConvCheck_icc
+#define ConvCheck_icc
+
+#include "Utilities.hpp"
+#include "CudaMatrixUtilities.hpp"
+
+#include "GenRandomContactGraphClass.hpp"
+#include "GeneralStructs.hpp"
+#include "ConvergenceCheckFunc.hpp"
+#include "LoadingCPUBuffers.hpp"
+
+template<typename TSettings >
+ConvCheckTestVariant<TSettings>::ConvCheckTestVariant() {
+
+    m_nContacts=0;
+    m_nContactCounter=0;
+    m_nRandomRunsCounter=0;
+    m_numberOfBodies = 0;
+
+}
+
+
+
+template<typename BodyListType, typename MatrixType>
+void outputConvCheck(BodyListType& bodyDataList,MatrixType &m_outputMatrixCPU) {
+
+
+
+    unsigned int i=0;
+    for(auto & d : bodyDataList) {
+        if (d.test) {
+            m_outputMatrixCPU(i,0)=0;
+        } else {
+            m_outputMatrixCPU(i,0)=1;
+        }
+        i++;
+    }
+}
+
+
+template<typename TSettings >
+void ConvCheckTestVariant<TSettings>::runOnCPU() {
+
+    *m_pLog<<"run on CPU"<< std::endl;
+
+
+    // Write into fast data structure
+
+
+
+    std::vector<BodyData<PREC> > bodyDataList(m_numberOfBodies);
+
+    std::vector<ContactData<PREC> > contactDataList(1); ///< dummy data needed by load Complete
+    m_indexSetCPU.resize(1,5);
+    m_contBufferCPU.resize(1,45);
+
+    m_contBufferCPU=MatrixType::Zero(1,45);
+    m_indexSetCPU=MatrixUIntType::Zero(1,5);
+
+
+    LoadingCPUBuffers::loadComplete(     m_globalBufferCPU,
+                                         m_indexSetCPU,
+                                         m_contBufferCPU,
+                                         m_bodyBufferCPU,
+                                         contactDataList,
+                                         bodyDataList);
+
+    auto begin = std::chrono::high_resolution_clock::now();
+
+
+
+    for(unsigned int z=0;z<m_numberOfBodies;z++){
+        for(unsigned int i=0;i<6;i++)
+            {
+        bodyDataList[z].u_2[i] =bodyDataList[z].u[i] + m_redValBufferCPU[z+i*m_numberOfBodies];
+            }
+    }
+
+    ConvCheck::calcConvCheck<PREC>(bodyDataList);
+
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+     outputConvCheck(bodyDataList,m_outputMatrixCPU) ;
+
+     m_cpuIterationTime = std::chrono::duration<double,std::milli>(end - begin).count();
+     *m_pLog<<"CPU time in ms: "<< m_cpuIterationTime << std::endl;
+
+
+};
+
+
+
+template<typename TSettings >
+bool ConvCheckTestVariant<TSettings>::isEqual(PREC a,PREC b) {
+    return(std::abs(std::abs(a)-std::abs(b))<Tolerance);
+}
+
+template<typename TSettings >
+bool ConvCheckTestVariant<TSettings>::compareOutput() {
+    bool isconverged = true;
+
+
+    for (unsigned int j=0; j< m_implementedLengthOutput; j++) {
+
+        for(unsigned int i=0; i < m_numberOfBodies; i++) {
+            isconverged=isconverged&&isEqual(m_outputMatrixCPU(i,j),m_outputMatrixGPU(i,j));
+
+            if(isconverged==false) {
+                *m_pLog<<"ERROR not the same results" <<std::endl;
+                *m_pLog<<"Vectornumber row number :  "<<j <<"column number :  "<<i <<std::endl;
+                *m_pLog<<"CPU  "    <<m_outputMatrixCPU(i,j)<<"GPU  "<<m_outputMatrixGPU(i,j)<<std::endl;
+                isconverged=true;
+            }
+        }
+
+
+    }
+    return isconverged;
+}
+
+template<typename TSettings >
+void ConvCheckTestVariant<TSettings >:: initialize(std::ostream * pLog, std::ostream * pData) {
+
+    m_pData = pData;
+    m_pLog = pLog;
+
+    *m_pLog<<"initialize "<<std::endl;
+    m_nContactCounter =  ((int)(minNContacts + (stepNContacts -1 ) ) / stepNContacts) * stepNContacts ;
+
+    if(m_nContactCounter <=0) {
+        m_nContactCounter = stepNContacts;
+    }
+
+    m_nRandomRunsCounter =0;
+
+    std::srand ( (unsigned int)time(NULL) );
+
+    m_gpuVariant.initialize(m_pLog);
+
+}
+
+template<typename TSettings >
+bool ConvCheckTestVariant<TSettings >::generateNextTestProblem() {
+
+
+
+    RandomGeneratorType randGen(m_seed);
+    DistributionType distGen(1.0 , 3.0);
+
+    *m_pLog<<"generate next test problem"<<std::endl;
+
+    if(m_nContactCounter>maxNContacts) {
+        *m_pLog << "No more Test Problems to generate, --->exit ============="<<std::endl;
+        return false;
+    }
+
+
+    m_nContacts = m_nContactCounter;
+    *m_pLog << "Compute test for nContacts: "<< m_nContacts <<" ============="<<std::endl;
+
+
+    //m_nOps = m_numberOfBodies*3*55;
+
+    //ERRORMSG("DEFINE OPERATION (MULT ADD UND SOWEITER")
+    m_nBytesReadWrite = 100;
+
+    // REsize matrices CPU memory
+    m_numberOfBodies=m_nContacts;
+
+    m_outputMatrixGPU.resize(m_numberOfBodies,m_implementedLengthOutput);
+    m_outputMatrixCPU.resize(m_numberOfBodies,m_implementedLengthOutput);
+
+        /// ===============================================================  ///
+
+    m_bodyBufferGPU.resize((m_numberOfBodies),m_bodyBufferLength);
+    m_bodyBufferCPU.resize((m_numberOfBodies),m_bodyBufferLength);
+
+    m_globalBufferGPU.resize(m_rowsInGlobalBuffer,m_globalBufferLength);
+    m_globalBufferCPU.resize(m_rowsInGlobalBuffer,m_globalBufferLength);
+
+    m_redValBufferGPU.resize(m_numberOfBodies*6);
+    m_redValBufferCPU.resize(m_numberOfBodies*6);
+
+
+    //reset randomRun
+    m_nRandomRunsCounter = 0;
+
+
+    m_gpuVariant.initializeTestProblem(m_bodyBufferGPU,
+                                       m_globalBufferGPU,
+                                       m_outputMatrixGPU);
+
+    // Increment counter
+    m_nContactCounter += stepNContacts;
+
+    return true;
+}
+
+template<typename TSettings >
+bool ConvCheckTestVariant<TSettings >::generateNextRandomRun() {
+
+DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES
+
+ RandomGeneratorType randGen(m_nRandomRunsCounter);
+    DistributionType distGen(1.0 , 3.0);
+
+     *m_pLog<<"generate next random run"<<std::endl;
+
+    if(m_nRandomRunsCounter < maxNRandomRuns) {
+        m_nRandomRunsCounter++;
+    } else {
+        return false;
+    }
+
+    *m_pLog << "Random Run # : "<<m_nRandomRunsCounter<<std::endl;
+
+    // Set Values! ==============================
+    // Generate a function object (unary function which takes a dummy parameter and return random value)
+    std::function<PREC(PREC)> func = [&](PREC dummy){ return distGen(randGen);};
+    // ==========================================
+         ///  ========================================================================  ///
+         for(unsigned int i=0;i<6*m_numberOfBodies;i++){
+
+            m_redValBufferGPU[i]= distGen(randGen);
+
+         }
+
+
+    m_redValBufferCPU=m_redValBufferGPU;
+
+    m_bodyBufferGPU = m_bodyBufferGPU.array().unaryExpr(func); // hand over this unaray function to eigen unaryExpr(...)
+    m_bodyBufferCPU = m_bodyBufferGPU;
+
+    for(int z=0; z<m_rowsInGlobalBuffer; z++) {
+        for(int i=0; i<m_globalBufferLength; i++) {
+            m_globalBufferGPU(z,i) = 0; // hand over this unaray function to eigen unaryExpr(...)
+            m_globalBufferCPU(z,i) =0;
+        }
+    }
+
+    ///  ========================================================================  ///
+
+    return true;
+}
+
+template<typename TSettings >
+void ConvCheckTestVariant<TSettings >::checkResults() {
+    if(compareOutput()) {
+       *m_pLog<< "Results are Identical"<< std::endl;
+    }
+
+    double relTolGPUCPU = 1e-5;
+    unsigned int tolUlpGPUCPU = 20000;
+
+    bool b1,b2,b3,b4;
+    std::tie(b1,b2,b3,b4) = Utilities::compareArraysEachCombined(m_outputMatrixGPU.data(),
+                                 m_outputMatrixCPU.data(),
+                                 m_numberOfBodies*m_implementedLengthOutput,
+                                 relTolGPUCPU,
+                                 tolUlpGPUCPU,
+                                 m_maxRelTol,
+                                 m_avgRelTol,
+                                 m_maxUlp,
+                                 m_avgUlp,
+                                 false);
+
+
+
+    //TODO Eliminate warning???
+    if(b1 && b2 && b3 && b4 ){
+        *m_pLog << " ---> GPU/CPU identical!...." << std::endl;
+    }else{
+        *m_pLog << " ---> GPU/CPU NOT identical!...." << std::endl;
+    }
+        *m_pLog << " ---> Converged relTol: "<<b1  <<" \t Identical Ulp: "<< b2
+                << "      CPU finite: "<<b3  <<" \t GPU finite: "<< b4 << std::endl;
+
+
+
+
+    *m_pLog << " ---> maxUlp: " << (double)m_maxUlp << std::endl;
+    *m_pLog << " ---> avgUlp: " << m_avgUlp << std::endl;
+    *m_pLog << " ---> maxRelTol: " << m_maxRelTol << std::endl;
+    *m_pLog << " ---> avgRelTol: " << m_avgRelTol << std::endl;
+
+
+}
+
+template<typename TSettings >
+void ConvCheckTestVariant<TSettings >::writeData() {
+       using namespace boost;
+       *m_pData << boost::format("%1$.9d\t")
+            % m_nContacts;
+}
+
+template<typename TSettings >
+void ConvCheckTestVariant<TSettings >::runOnGPU() {
+
+
+    *m_pLog<<"run on GPU entered"<<std::endl;
+
+
+
+    m_gpuVariant.run(   m_numberOfBodies,
+                        m_bodyBufferGPU,
+                        m_globalBufferGPU,
+                        m_outputMatrixGPU,
+                        &m_redValBufferGPU[0]);
+
+    m_elapsedTimeCopyToGPU=m_gpuVariant.m_elapsedTimeCopyToGPU;
+    m_elapsedTimeCopyFromGPU=m_gpuVariant.m_elapsedTimeCopyFromGPU;
+    m_gpuIterationTime=m_gpuVariant.m_gpuIterationTime;
+
+}
+
+template<typename TSettings >
+void ConvCheckTestVariant<TSettings >::cleanUpTestProblem() {
+
+    *m_pLog << "Entered the cleanup function "<<std::endl;
+     m_gpuVariant.cleanUpTestProblem();
+
+    m_outputMatrixCPU.resize(0,0);
+    m_outputMatrixGPU.resize(0,0);
+}
+
+
+
+
+#endif

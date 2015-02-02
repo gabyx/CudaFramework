@@ -1,13 +1,6 @@
-// ========================================================================================
-//  CudaFramework
-//  Copyright (C) 2014 by Gabriel Nützi <nuetzig (at) imes (d0t) mavt (d0t) ethz (d0t) ch>
-//
-//  This Source Code Form is subject to the terms of the GNU GPL 3.0 licence. 
-//  If a copy of the GNU GPL 3.0 was not distributed with this
-//  file, you can obtain one at http://opensource.org/licenses/GPL-3.0.
-// ========================================================================================
-#ifndef CudaFramework_Kernels_JORProxVel_GPUBufferOffsets_hpp
-#define CudaFramework_Kernels_JORProxVel_GPUBufferOffsets_hpp
+
+#ifndef GPUBufferOffsets_hpp
+#define GPUBufferOffsets_hpp
 
 
 #define DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES \
@@ -34,6 +27,7 @@ namespace JORProxVelGPU{
     struct BodyBufferOffsets {
 
         static const unsigned   int omegaOff= 3;  ///<  omega Offset
+
         static const unsigned   int u1_s = 0;  ///< velocity v
         static const unsigned   int u1_l = 6;
 
@@ -53,21 +47,10 @@ namespace JORProxVelGPU{
         static const unsigned  int tq_l = 3;
 
 
-        ///====================================================///
-
-
-        static const unsigned  int du_s = tq_s+tq_l;  ///< delta velocity v  ///<20
-        static const unsigned  int du_l = 6;
-
 
         ///====================================================///
 
-        static const unsigned  int u2_s = tq_s+tq_l; /// u buffer front ///<20
-        static const unsigned  int u2_l =6;
-
-
-
-        static const unsigned  int length = u1_l+q_l+thetaInv_l+mInv_l+f_l+tq_l+du_l;
+        static const unsigned  int length = u1_l+q_l+thetaInv_l+mInv_l+f_l+tq_l;
 
     };
 
@@ -95,7 +78,7 @@ namespace JORProxVelGPU{
         static const unsigned  int w2r_s = 18;  /// general force direction body 2 lower 3x3 block (angular velocity)
         static const unsigned  int w2r_l = 9;
 
-        static const unsigned  int lambda_s = 29;   /// general force lambda
+        static const unsigned  int lambda_s = 27;   /// general force lambda
         static const unsigned  int lambda_l = 3;
 
         static const unsigned  int chi_s = 30;   /// chi which is 0 for simulated bodies
@@ -167,9 +150,6 @@ namespace JORProxVelGPU{
 };
 
 };
-
-//TODO maybe somewhere else, do you need it often? if only used once or two, maybe remove the macro ...
-#define GET_U_BUFFER_IDX(iteration) ( ((iteration & 0x1)==0) ?  JORProxVelGPU::GPUBufferOffsets::BodyBufferOffsets::u1_s : JORProxVelGPU::GPUBufferOffsets::BodyBufferOffsets::u2_s)
 
 
 #endif // GPUBufferOffsets

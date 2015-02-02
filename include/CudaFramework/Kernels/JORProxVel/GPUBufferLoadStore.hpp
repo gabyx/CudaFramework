@@ -1,20 +1,13 @@
-// ========================================================================================
-//  CudaFramework
-//  Copyright (C) 2014 by Gabriel Nützi <nuetzig (at) imes (d0t) mavt (d0t) ethz (d0t) ch>
-//
-//  This Source Code Form is subject to the terms of the GNU GPL 3.0 licence. 
-//  If a copy of the GNU GPL 3.0 was not distributed with this
-//  file, you can obtain one at http://opensource.org/licenses/GPL-3.0.
-// ========================================================================================
-#ifndef CudaFramework_Kernels_JORProxVel_GPUBufferLoadStore_hpp
-#define CudaFramework_Kernels_JORProxVel_GPUBufferLoadStore_hpp
+
+#ifndef GPUBufferLoadStore_hpp
+#define GPUBufferLoadStore_hpp
 
 #include <type_traits>
 #include "TypeDefs.hpp"
-#include "CudaFramework/General/StaticAssert.hpp"
-#include "CudaFramework/General/AssertionDebug.hpp"
+#include "StaticAssert.hpp"
+#include "AssertionDebug.hpp"
 
-#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
+#include "GPUBufferOffsets.hpp"
 
 #include "EnumClassHelper.hpp"
 #include "ContactModels.hpp"
@@ -30,6 +23,7 @@ namespace JORProxVelGPU{
 
     /**
     * Initialize the JORProxVelGPU Buffers
+    * @param[in] bodyToNodesMap are only simulated bodies who are in contact
     */
     template<typename PREC,
              typename MatrixType,
@@ -57,20 +51,11 @@ namespace JORProxVelGPU{
         ASSERTMSG( bodyBuffer.rows() == bodyToNodesMap.size()    &&  bodyBuffer.cols()   == B::length, "Wrong Size");
         ASSERTMSG( csrReductionBuffer.rows() == bodyToNodesMap.size()    &&  csrReductionBuffer.cols()   == 1, "Wrong Size");
 
-        // generate csr for the velocity reduction buffer
-        csrReductionBuffer[0] = 0;
-        // take care: the iteration order of bodyToNodesMap defines the body index order!!!
-        auto p = bodyToNodesMap.begin(); auto itEnd = bodyToNodesMap.end();
-        unsigned int i = 0;
-        for(; std::next(p) != itEnd; ++p){ // p is std::pair<bodyPtr, contactNodeList>
-            ++i;
-            csrReductionBuffer[i] = csrReductionBuffer[i-1] + p->second.size(); // get each bodies nodeList size
-        }
-        reductionBufferLength = csrReductionBuffer[i] + p->second.size();
+
 
         // fill body buffer
-        std::unordered_map<const void * , unsigned int> bodyToIdx;
-        i=0;
+        std::unordered_map<const void * , unsigned int> bodyToIdx; // idx in bodyBuffer
+        unsigned int i=0;
         for(auto & d : bodyToNodesMap) {
              auto bodyPtr = d.first;
              bodyBuffer.template block<1,B::u1_l>(i,B::u1_s)       = bodyPtr->m_pSolverData->m_uBuffer.m_back;  // velocity
@@ -85,10 +70,12 @@ namespace JORProxVelGPU{
 
         // fill contact buffer
         i=0;
+        std::unordered_map<const void * , unsigned int> nodeToIdx; // idx in contBuffer
         for(auto & c : contactNodeList) {
 
             auto & nodeData = c->m_nodeData;
             auto & pCollData = nodeData.m_pCollData;
+
 
             if(nodeData.m_contactParameter.m_contactModel == ContactModels::Enum::UCF){
 
@@ -98,11 +85,12 @@ namespace JORProxVelGPU{
 
             using CMT = typename CONTACTMODELTYPE(ContactModels::Enum::UCF);
 
+
             contBuffer.template block<1,C::lambda_l>(i,C::lambda_s)    = Vector3(0,0,0); ///< lambda old is zero at start !
             contBuffer.template block<1,C::n_l>(i,C::n_s)              = pCollData->m_cFrame.m_e_z;
             contBuffer.template block<1,C::rSC1_l>(i,C::rSC1_s)        = pCollData->m_r_S1C1;
             contBuffer.template block<1,C::rSC2_l>(i,C::rSC2_s)        = pCollData->m_r_S2C2;
-            contBuffer.template block<1,C::chi_l>(i,C::chi_s)           = nodeData.m_chi;
+            contBuffer.template block<1,C::chi_l>(i,C::chi_s)          = nodeData.m_chi;
             contBuffer.template block<1,C::eps_l>(i,C::eps_s)          = nodeData.m_eps;       ///< only the diag of eps
 
             STATIC_ASSERT(C::alpha_l == 1 && C::mu_l == 1)
@@ -110,10 +98,11 @@ namespace JORProxVelGPU{
             contBuffer(i,C::mu_s)                                      = nodeData.m_contactParameter.m_params[CMT::muIdx];
 
             // insert bodyIdx into index set
-            using RigidBodyType = typename std::remove_pointer<decltype(pCollData->m_pBody1)>::type;
+
             auto mode1 = pCollData->m_pBody1->m_eMode; auto mode2 = pCollData->m_pBody2->m_eMode;
 
             STATIC_ASSERT(I::b1Idx_l == 1 && I::b2Idx_l == 1)
+             using RigidBodyType = typename std::remove_pointer<decltype(pCollData->m_pBody1)>::type;
             if( mode1 == RigidBodyType::BodyMode::SIMULATED && mode2 == RigidBodyType::BodyMode::SIMULATED){
                 indexSet(i,I::b1Idx_s) = bodyToIdx[pCollData->m_pBody1];
                 indexSet(i,I::b2Idx_s) = bodyToIdx[pCollData->m_pBody2];
@@ -129,8 +118,47 @@ namespace JORProxVelGPU{
                 ERRORMSG("body1 state: " << EnumConversion::toIntegral(mode1) << " body2 state: " << EnumConversion::toIntegral(mode2) <<"!");
             }
 
+            nodeToIdx.emplace(c,i);
+
+            //
             ++i;
         }
+
+
+        // Generate csr for the velocity reduction buffer
+        csrReductionBuffer[0] = 0;
+        // take care: the iteration order of bodyToNodesMap defines the body index order!!!
+        auto p = bodyToNodesMap.begin(); auto itEnd = bodyToNodesMap.end();
+        i = 0;
+        for( ;std::next(p) != itEnd; ++p){ // p is std::pair<bodyPtr, contactNodeList>
+            ++i;
+            csrReductionBuffer[i] = csrReductionBuffer[i-1] + p->second.size(); // get each bodies nodeList size
+        }
+        reductionBufferLength = csrReductionBuffer[i] + p->second.size();
+
+        // Iterate over all contact nodes and set the reduction buffer idx in the corresponding contact node
+        unsigned int redIdx = 0;
+        p = bodyToNodesMap.begin(); itEnd = bodyToNodesMap.end();
+        for( ;p != itEnd; ++p){
+         //Init reduction idx in indexBuffer
+            for( auto & nodePtr : p->second){
+                auto it = nodeToIdx.find(nodePtr);
+                // it->second  is the index in the contactBuffer for this contact
+                ASSERTMSG(it != nodeToIdx.end(),"NodePtr not found!");
+                ASSERTMSG(it->second >= 0 && it->second < contactNodeList.size(), "wrong idx");
+                // Check if this body is body 1 or body 2
+                if(p->first == nodePtr->m_nodeData.m_pCollData->m_pBody1){
+                    indexSet(it->second ,I::redIdx_s + 0) = redIdx;
+                }else{
+                    ASSERTMSG(p->first == nodePtr->m_nodeData.m_pCollData->m_pBody2 , "Body pointer : " << p->first << "not found in contact: " << nodePtr);
+                    indexSet(it->second ,I::redIdx_s + 1) = redIdx;
+                }
+                redIdx++;
+            }
+        }
+
+        //Initialize global buffer
+        globalBuffer.setZero();
 
     };
 
@@ -163,7 +191,7 @@ namespace JORProxVelGPU{
         else{
             for(auto & d : bodyToNodesMap) {
                  auto bodyPtr = d.first;
-                 bodyPtr->m_pSolverData->m_uBuffer.m_front = bodyBuffer.template block<1,B::u2_l>(i,B::u1_s);  // velocity
+                 bodyPtr->m_pSolverData->m_uBuffer.m_front = bodyBuffer.template block<1,B::u1_l>(i,B::u1_s);
                  i++;
             }
         }
