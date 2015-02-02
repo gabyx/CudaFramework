@@ -7,15 +7,19 @@
 #include <chrono>
 #include <random>
 
+#include <Eigen/Dense>
+
 #include <boost/format.hpp>
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
 
 #include "CudaFramework/General/AssertionDebug.hpp"
-//#include "MyMatrixDefs.hpp"
+#include "CudaFramework/General/TypeDefs.hpp"
+
+#include INCLUDE_MyMatrixDefs_hpp
 
 #include "CudaFramework/CudaModern/CudaError.hpp"
-#include <Eigen/Dense>
+
 
 #include "CudaFramework/General/FloatingPointType.hpp"
 #include "CudaFramework/CudaModern/CudaMatrix.hpp"
@@ -204,6 +208,9 @@ public:
 public:
 
     void initialize(std::ostream * pLog, std::ostream * pData);
+     /** Check settings at runtime, static settings are already checked at compile time*/
+    bool checkSettings(int gpuID){WARNINGMSG(false,"checkSettings not correctly implemented!"); return true;}
+
     bool generateNextTestProblem();
     bool generateNextRandomRun();
     void writeHeader();

@@ -23,7 +23,7 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* 
+*
 *  Source code modified and extended from moderngpu.com
 ******************************************************************************/
 
@@ -144,7 +144,7 @@ DeviceMemPtr<T> CudaMemSupport::genRandom(size_t count, T min, T max) {
 	std::vector<T> data(count);
 
 	RandomGenerator generator;
-    std::uniform_int_distribution<T> distribution(min,max);
+    std::uniform_real_distribution<T> distribution(min,max);
 
 	for(size_t i = 0; i < count; ++i)
 		data[i] = distribution(generator);

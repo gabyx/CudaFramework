@@ -23,20 +23,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Cuda extern C includes
 
-#include <boost/variant.hpp>
-
 
 
 int main()
 {
-
 
     typedef KernelTestMethod<
          KernelTestMethodSettings<false,true> ,
          JORProxVelTestVariant<
             JORProxVelSettings<
                 double,
-                JORProxVelTestRangeSettings<2,2,1,1>,
+                JORProxVelTestRangeSettings<1000000,1000000,1,1>,
                 JORProxVelGPUVariantSettings<1>
             >
          >

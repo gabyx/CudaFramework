@@ -6,7 +6,7 @@
 #include <chrono>
 #include <iostream>
 
-#include <boost/format.hpp>
+//#include <boost/format.hpp>
 
 #include "CudaFramework/CudaModern/CudaUtilities.hpp"
 
