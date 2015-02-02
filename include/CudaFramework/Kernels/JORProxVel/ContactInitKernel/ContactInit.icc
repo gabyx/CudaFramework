@@ -1,18 +1,18 @@
 #ifndef ContactInit_icc
 #define ContactInit_icc
 #include <iomanip>
-#include "Utilities.hpp"
+#include "CudaFramework/General/Utilities.hpp"
 
-#include "GeneralStructs.hpp"
-#include "BodyInitFunc.hpp"
-#include "ContactInitFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
+#include "CudaFramework/Kernels/JORProxVel/BodyInitKernel/BodyInitFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactInitKernel/ContactInitFunc.hpp"
 
-#include "GenRandomContactGraphClass.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GenRandomContactGraphClass.hpp"
 
-#include "LoadingCPUBuffers.hpp"
-#include "AssertionDebug.hpp"
-#include "BodyInitFunc.hpp"
-#include "ContactInitFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/LoadingCPUBuffers.hpp"
+#include "CudaFramework/General/AssertionDebug.hpp"
+#include "CudaFramework/Kernels/JORProxVel/BodyInitKernel/BodyInitFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactInitKernel/ContactInitFunc.hpp"
 
 
 template<typename VariantLaunchSettings >

@@ -2,9 +2,9 @@
 
 
 
-#include "PartitionKernel.cuh"
-#include "ReductionKernel.cuh"
-#include "ReduceSpineKernels.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/KernelsWrappers/PartitionKernel.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/KernelsWrappers/ReductionKernel.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/KernelsWrappers/ReduceSpineKernels.cuh"
 
 namespace ReductionGPU {
 

@@ -1,8 +1,8 @@
 #include <cuda_runtime.h>
 
 #include <BodyInit.cuh>
-#include "CudaMatrix.hpp"
-#include "VariantLaunchSettings.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
+#include "CudaFramework/Kernels/JORProxVel/VariantLaunchSettings.hpp"
 
 
 

@@ -7,15 +7,15 @@
 #include <iostream>
 #include <boost/format.hpp>
 
-#include "CudaUtilities.hpp"
-#include "AssertionDebug.hpp"
-#include "FloatingPointType.hpp"
-#include "CudaError.hpp"
-#include "Utilities.hpp"
-#include "CudaContext.hpp"
-#include "CudaPrint.hpp"
-#include "Reduction.hpp"
-#include "Enum.h"
+#include "CudaFramework/CudaModern/CudaUtilities.hpp"
+#include "CudaFramework/General/AssertionDebug.hpp"
+#include "CudaFramework/General/FloatingPointType.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
+#include "CudaFramework/General/Utilities.hpp"
+#include "CudaFramework/CudaModern/CudaContext.hpp"
+#include "CudaFramework/CudaModern/CudaPrint.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/Reduction.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/Enum.h"
 
 
 //Prototyp
@@ -159,6 +159,9 @@ public:
 public:
 
     void initialize(std::ostream * pLog, std::ostream * pData);
+    /** Check settings at runtime, static settings are already checked at compile time*/
+    bool checkSettings(int gpuID){WARNINGMSG(false,"checkSettings not correctly implemented!"); return true;}
+
     bool generateNextTestProblem();
     bool generateNextRandomRun();
 
@@ -209,7 +212,7 @@ std::vector<std::string>
 
 };
 
-#include "ReductionTestVariant.icc"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/ReductionTestVariant.icc"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -290,9 +293,7 @@ void demoSegReduceCsr(utilCuda::CudaContext& context, std::vector<Type2>& segmen
 
 	***/
 
-   utilCuda::loadhost( *resultsDevice,
-                       (*Output).size(),
-                        Output);
+   ASSERTCHECK_CUDA(resultsDevice->toHost((*Output)));
 }
 
 template<typename PREC,typename PREC1>

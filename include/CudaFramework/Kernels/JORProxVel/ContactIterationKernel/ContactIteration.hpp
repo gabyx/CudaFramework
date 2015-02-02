@@ -8,18 +8,18 @@
 #include <random>
 
 #include <boost/format.hpp>
-#include "CudaMatrixUtilities.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
 
-#include "AssertionDebug.hpp"
-#include "CudaError.hpp"
+#include "CudaFramework/General/AssertionDebug.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
 #include <Eigen/Dense>
-#include "ContactIterationKernelWrap.hpp"
-#include "FloatingPointType.hpp"
-#include "CudaMatrix.hpp"
-#include "GPUBufferOffsets.hpp"
-#include "VariantLaunchSettings.hpp"
-#include "GenRandomContactGraphClass.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactIterationKernel/ContactIterationKernelWrap.hpp"
+#include "CudaFramework/General/FloatingPointType.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/VariantLaunchSettings.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GenRandomContactGraphClass.hpp"
 
 
 
@@ -205,6 +205,8 @@ public:
 public:
 
     void initialize(std::ostream * pLog, std::ostream * pData);
+    /** Check settings at runtime, static settings are already checked at compile time*/
+    bool checkSettings(int gpuID){WARNINGMSG(false,"checkSettings not correctly implemented!"); return true;}
     bool generateNextTestProblem();
     bool generateNextRandomRun();
 
@@ -250,7 +252,7 @@ std::vector<std::string>
 
 };
 
-#include "ContactIteration.icc"
+#include "CudaFramework/Kernels/JORProxVel/ContactIterationKernel/ContactIteration.icc"
 
 
 /**
@@ -419,11 +421,11 @@ public:
         CHECK_CUDA(cudaEventRecord(start,0));
 
 
-        CHECK_CUDA(utilCuda::copyMatrixToDevice(m_indexSetDev,indexSetGPU,time+3));
-        CHECK_CUDA(utilCuda::copyMatrixToDevice(m_contactDev,contBufferGPU,time+3));
-        CHECK_CUDA(utilCuda::copyMatrixToDevice(m_bodyDev,bodyBufferGPU,time+3));
+        CHECK_CUDA(utilCuda::copyMatrixToDevice(m_indexSetDev,indexSetGPU));
+        CHECK_CUDA(utilCuda::copyMatrixToDevice(m_contactDev,contBufferGPU));
+        CHECK_CUDA(utilCuda::copyMatrixToDevice(m_bodyDev,bodyBufferGPU));
         CHECK_CUDA(cudaMemcpy(m_reductionDev,&(reductionBufferGPU[0]),redLength*sizeof(PREC),cudaMemcpyHostToDevice));
-        CHECK_CUDA(utilCuda::copyMatrixToDevice(m_globalDev,globalBufferGPU,time+3));
+        CHECK_CUDA(utilCuda::copyMatrixToDevice(m_globalDev,globalBufferGPU));
 
         CHECK_CUDA(cudaEventRecord(stop,0));
         CHECK_CUDA(cudaEventSynchronize(stop));
@@ -443,16 +445,23 @@ public:
 
         runKernel<TVariantId>(numberOfContacts);
 
-        /// Delete Events
-        CHECK_CUDA(cudaEventDestroy(start));
-        CHECK_CUDA(cudaEventDestroy(stop));
 
-        utilCuda::copyMatrixToHost(outputMatrixGPU,m_outDev,time);
+
+        CHECK_CUDA(cudaEventRecord(start,0));
+        CHECK_CUDA(utilCuda::copyMatrixToHost(outputMatrixGPU,m_outDev));
+        CHECK_CUDA(cudaEventRecord(stop,0));
+        CHECK_CUDA(cudaEventSynchronize(stop));
+        CHECK_CUDA(cudaEventElapsedTime(time,start,stop));
         *m_pLog <<"Copy Time To Host is: "<< time[0] <<" ms"<< std::endl;
 
         m_elapsedTimeCopyFromGPU=double(time[0]);
 
         m_nops=176;
+
+        /// Delete Events
+        CHECK_CUDA(cudaEventDestroy(start));
+        CHECK_CUDA(cudaEventDestroy(stop));
+
 
         *m_pLog << " ---> Iteration Time GPU:"<< m_gpuIterationTime <<std::endl;
         *m_pLog << " ---> Copy time from GPU:"<< m_elapsedTimeCopyFromGPU <<std::endl;

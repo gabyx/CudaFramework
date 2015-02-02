@@ -4,10 +4,10 @@
 
 #include <type_traits>
 #include "TypeDefs.hpp"
-#include "StaticAssert.hpp"
-#include "AssertionDebug.hpp"
+#include "CudaFramework/General/StaticAssert.hpp"
+#include "CudaFramework/General/AssertionDebug.hpp"
 
-#include "GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
 
 #include "EnumClassHelper.hpp"
 #include "ContactModels.hpp"

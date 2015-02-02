@@ -7,7 +7,7 @@
 #include <random>
 #include <algorithm>
 
-#include "GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
 
 template<typename VectorIntType,typename MatrixType,typename MatrixUIntType>
 class GenRndContactGraph {

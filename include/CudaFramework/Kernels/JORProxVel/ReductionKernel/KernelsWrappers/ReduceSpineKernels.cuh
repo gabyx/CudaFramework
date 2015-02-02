@@ -38,7 +38,7 @@
 #include "DeviceUtilities/GPUDefines.cuh"
 #include "DeviceUtilities/DeviceOp.cuh"
 
-#include "Enum.h"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/Enum.h"
 namespace ReductionGPU {
 
 ////////////////////////////////////////////////////////////////////////////////

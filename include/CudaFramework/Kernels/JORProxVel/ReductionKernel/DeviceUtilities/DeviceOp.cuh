@@ -41,7 +41,7 @@
 #endif
 
 #include <climits>
-#include "Static.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/HostUtilities/Static.hpp"
 
 #ifdef _MSC_VER
 #define INLINESYMBOL __forceinline__

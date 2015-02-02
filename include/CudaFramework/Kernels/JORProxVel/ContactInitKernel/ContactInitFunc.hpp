@@ -1,7 +1,7 @@
 #ifndef ContactInitFunc_hpp
 #define ContactInitFunc_hpp
-#include "GeneralStructs.hpp"
-#include "GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
 
 namespace ContactInit{
 

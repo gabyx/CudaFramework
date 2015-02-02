@@ -3,17 +3,17 @@
 
 #include <iomanip>
 
-#include "Utilities.hpp"
-#include "CudaMatrixUtilities.hpp"
+#include "CudaFramework/General/Utilities.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
-#include "GenRandomContactGraphClass.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GenRandomContactGraphClass.hpp"
 
-#include "LoadingCPUBuffers.hpp"
-#include "BodyInitFunc.hpp"
-#include "ContactInitFunc.hpp"
-#include "ContactIterationFunc.hpp"
-#include "ConvergenceCheckFunc.hpp"
-#include "GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/LoadingCPUBuffers.hpp"
+#include "CudaFramework/Kernels/JORProxVel/BodyInitKernel/BodyInitFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactInitKernel/ContactInitFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactIterationKernel/ContactIterationFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ConvergenceCheckKernel/ConvergenceCheckFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
 
 
 template<typename TSettings >

@@ -4,8 +4,8 @@
 
 #include <cmath>
 #include <iostream>
-#include "CudaMatrix.hpp"
-#include "VariantLaunchSettings.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
+#include "CudaFramework/Kernels/JORProxVel/VariantLaunchSettings.hpp"
 
 namespace ConvCheck{
 template<bool genOutput,bool convInVel,typename PREC,typename TCudaMatrix,typename TCudaIntMatrix>

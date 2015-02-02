@@ -9,17 +9,17 @@
 #include <chrono>
 #include <iostream>
 
-#include "ConvergenceCheck.hpp"
-#include "ContactIteration.hpp"
-#include "ContactInit.hpp"
-#include "ReductionTestVariant.hpp"
-#include "BodyInit.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ConvergenceCheckKernel/ConvergenceCheck.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactIterationKernel/ContactIteration.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactInitKernel/ContactInit.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/ReductionTestVariant.hpp"
+#include "CudaFramework/Kernels/JORProxVel/BodyInitKernel/BodyInit.hpp"
 
-#include "PerformanceTest.hpp"
+#include "CudaFramework/PerformanceTest/PerformanceTest.hpp"
 
 
 
-//#include "PerformanceTest.hpp"
+//#include "CudaFramework/PerformanceTest/PerformanceTest.hpp"
 ////////////////////////////////////////////////////////////////////////////////
 // Cuda extern C includes
 

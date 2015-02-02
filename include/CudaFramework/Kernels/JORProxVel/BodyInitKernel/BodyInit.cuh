@@ -4,13 +4,13 @@
 
 
 #include <cuda_runtime.h>
-#include "VariantLaunchSettings.hpp"
-#include "StaticAssert.hpp"
-#include "CudaError.hpp"
-#include "CudaMatrix.hpp"
+#include "CudaFramework/Kernels/JORProxVel/VariantLaunchSettings.hpp"
+#include "CudaFramework/General/StaticAssert.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
 
-#include "UtilitiesMatrixVector.cuh"
-#include "GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/UtilitiesMatrixVector.cuh"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
 
 
 

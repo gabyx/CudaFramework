@@ -1,9 +1,9 @@
 #include <cuda_runtime.h>
 
-#include "ContactInit.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ContactInitKernel/ContactInit.cuh"
 
-#include "CudaMatrix.hpp"
-#include "VariantLaunchSettings.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
+#include "CudaFramework/Kernels/JORProxVel/VariantLaunchSettings.hpp"
 
 #define PREC double
 template __host__ void  ContactInit::contactInitKernelWrap<false>(utilCuda::CudaMatrix<PREC> bodyBuffer,

@@ -36,7 +36,7 @@
 # define loadstore_cuh
 
 #include <cuda_runtime.h>
-#include "Instantiations.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceUtilities/Instantiations.cuh"
 
 namespace ReductionGPU {
 

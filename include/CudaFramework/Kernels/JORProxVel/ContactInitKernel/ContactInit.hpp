@@ -8,19 +8,19 @@
 
 #include <boost/format.hpp>
 
-#include "CudaUtilities.hpp"
+#include "CudaFramework/CudaModern/CudaUtilities.hpp"
 
 
-#include "AssertionDebug.hpp"
-#include "CudaError.hpp"
+#include "CudaFramework/General/AssertionDebug.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
 #include <Eigen/Dense>
-#include "ContactInitKernelWrap.hpp"
-#include "FloatingPointType.hpp"
-#include "CudaMatrix.hpp"
-#include "CudaMatrixUtilities.hpp"
-#include "VariantLaunchSettings.hpp"
-#include "GPUBufferOffsets.hpp"
-#include "GenRandomContactGraphClass.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactInitKernel/ContactInitKernelWrap.hpp"
+#include "CudaFramework/General/FloatingPointType.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
+#include "CudaFramework/Kernels/JORProxVel/VariantLaunchSettings.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GenRandomContactGraphClass.hpp"
 
 
 #include <cuda_runtime.h>
@@ -204,6 +204,8 @@ public:
 public:
 
     void initialize(std::ostream * pLog, std::ostream * pData);
+    /** Check settings at runtime, static settings are already checked at compile time*/
+    bool checkSettings(int gpuID){WARNINGMSG(false,"checkSettings not correctly implemented!"); return true;}
     bool generateNextTestProblem();
     bool generateNextRandomRun();
     void runOnGPU();
@@ -247,7 +249,7 @@ std::vector<std::string>
 
 };
 
-#include "ContactInit.icc"
+#include "CudaFramework/Kernels/JORProxVel/ContactInitKernel/ContactInit.icc"
 
 
 /**
@@ -430,7 +432,7 @@ typedef Eigen::Matrix<PREC,Eigen::Dynamic, Eigen::Dynamic,Eigen::RowMajor>  Matr
 
 
         CHECK_CUDA(cudaEventRecord(start,0));
-        CHECK_CUDA(utilCuda::copyMatrixToHost(outputMatrixGPU,m_outDev,time));
+        CHECK_CUDA(utilCuda::copyMatrixToHost(outputMatrixGPU,m_outDev));
 
         CHECK_CUDA(cudaEventRecord(stop,0));
         CHECK_CUDA(cudaEventSynchronize(stop));

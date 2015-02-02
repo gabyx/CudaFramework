@@ -6,14 +6,14 @@
 #include <stdio.h>
 #include <chrono>
 #include <iostream>
-#include "CudaContext.hpp"
-#include "CudaError.hpp"
-#include "ContactInit.hpp"
-#include "PerformanceTest.hpp"
+#include "CudaFramework/CudaModern/CudaContext.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactInitKernel/ContactInit.hpp"
+#include "CudaFramework/PerformanceTest/PerformanceTest.hpp"
 
 
 
-//#include "PerformanceTest.hpp"
+//#include "CudaFramework/PerformanceTest/PerformanceTest.hpp"
 ////////////////////////////////////////////////////////////////////////////////
 // Cuda extern C includes
 

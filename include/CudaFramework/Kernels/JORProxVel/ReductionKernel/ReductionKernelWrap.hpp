@@ -36,12 +36,12 @@
 #ifndef ReductionKernelWrap_hpp
 #define ReductionKernelWrap_hpp
 
-#include "CudaContext.hpp"
-#include "CudaTypeDefs.hpp"
+#include "CudaFramework/CudaModern/CudaContext.hpp"
+#include "CudaFramework/CudaModern/CudaTypeDefs.hpp"
 #include "HostUtilities/Tuning.hpp"
 #include "HostUtilities/TuningFunctions.hpp"
 #include "HostUtilities/Static.hpp"
-#include "Enum.h"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/Enum.h"
 
 
 namespace ReductionGPU {

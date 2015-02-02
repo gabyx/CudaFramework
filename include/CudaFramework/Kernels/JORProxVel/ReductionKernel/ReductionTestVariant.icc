@@ -1,7 +1,7 @@
 #ifndef ReductionTestVariant_icc
 #define ReductionTestVariant_icc
 
-#include "Utilities.hpp"
+#include "CudaFramework/General/Utilities.hpp"
 
 template<typename VariantLaunchSettings >
 ReductionTestVariant<VariantLaunchSettings>::ReductionTestVariant() {

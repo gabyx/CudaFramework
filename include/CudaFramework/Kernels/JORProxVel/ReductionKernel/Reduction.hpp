@@ -38,8 +38,8 @@
 #define Reduction_hpp
 
 
-#include "ReductionKernelWrap.hpp"
-#include "Enum.h"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/ReductionKernelWrap.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/Enum.h"
 
 
 

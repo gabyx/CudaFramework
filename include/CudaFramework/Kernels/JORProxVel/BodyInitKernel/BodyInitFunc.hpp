@@ -1,8 +1,8 @@
 #ifndef BodyInitFunc_hpp
 #define BodyInitFunc_hpp
 
-#include "GeneralStructs.hpp"
-#include "AssertionDebug.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
+#include "CudaFramework/General/AssertionDebug.hpp"
 
 namespace BodyInit{
 

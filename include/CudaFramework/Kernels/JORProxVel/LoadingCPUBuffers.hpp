@@ -2,8 +2,8 @@
 #ifndef LoadingCPUBuffers_hpp
 #define LoadingCPUBuffers_hpp
 
-#include "GeneralStructs.hpp"
-#include "AssertionDebug.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
+#include "CudaFramework/General/AssertionDebug.hpp"
 
 
 namespace LoadingCPUBuffers{

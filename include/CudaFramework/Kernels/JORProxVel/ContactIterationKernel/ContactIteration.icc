@@ -1,13 +1,13 @@
 #ifndef ContactIteration_icc
 #define ContactIteration_icc
 
-#include "Utilities.hpp"
-#include "CudaMatrixUtilities.hpp"
-#include "GenRandomContactGraphClass.hpp"
-#include "GeneralStructs.hpp"
+#include "CudaFramework/General/Utilities.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GenRandomContactGraphClass.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
 
-#include "LoadingCPUBuffers.hpp"
-#include "ContactIterationFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/LoadingCPUBuffers.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactIterationKernel/ContactIterationFunc.hpp"
 
 
 

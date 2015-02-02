@@ -4,14 +4,14 @@
 
 
 #include <cuda_runtime.h>
-#include "CudaError.hpp"
-#include "CudaMatrix.hpp"
-#include "StaticAssert.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
+#include "CudaFramework/General/StaticAssert.hpp"
 
-#include "UtilitiesMatrixVector.cuh"
-#include "GPUBufferOffsets.hpp"
-#include "DeviceIntrinsics.cuh"
-#include "VariantLaunchSettings.hpp"
+#include "CudaFramework/Kernels/JORProxVel/UtilitiesMatrixVector.cuh"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/DeviceIntrinsics.cuh"
+#include "CudaFramework/Kernels/JORProxVel/VariantLaunchSettings.hpp"
 
 
 #define Elem_RowMuInt(_A,_row,_col)                             (     *( (unsigned int*)((char*)(_A.m_pDevice) + (_row) * (_A.m_outerStrideBytes)) + (_col) )     )

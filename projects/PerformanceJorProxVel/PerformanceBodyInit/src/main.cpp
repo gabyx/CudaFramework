@@ -9,19 +9,19 @@
 #include <chrono>
 #include <iostream>
 
-#include "CudaError.hpp"
-#include "BodyInitKernelWrap.hpp"
-#include "BodyInit.hpp"
-#include "CudaMatrixUtilities.hpp"
-//#include "Get_W_Class.hpp"
-
-#include "CudaMatrixUtilities.hpp"
-
-#include "PerformanceTest.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
+#include "CudaFramework/Kernels/JORProxVel/BodyInitKernel/BodyInitKernelWrap.hpp"
+#include "CudaFramework/Kernels/JORProxVel/BodyInitKernel/BodyInit.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
 
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
-//#include "PerformanceTest.hpp"
+#include "CudaFramework/PerformanceTest/PerformanceTest.hpp"
+
+
+
+//#include "CudaFramework/PerformanceTest/PerformanceTest.hpp"
 ////////////////////////////////////////////////////////////////////////////////
 // Cuda extern C includes
 

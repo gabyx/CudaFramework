@@ -4,14 +4,14 @@
 
 #include <cmath>
 #include <iostream>
-#include "CudaMatrix.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
 
-#include "ContactIterationKernelWrap.hpp"
-#include "ConvergenceCheckKernelWrap.hpp"
-#include "ContactInitKernelWrap.hpp"
-#include "BodyInitKernelWrap.hpp"
-#include "Reduction.hpp"
-#include "ReductionKernelWrap.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactIterationKernel/ContactIterationKernelWrap.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ConvergenceCheckKernel/ConvergenceCheckKernelWrap.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactInitKernel/ContactInitKernelWrap.hpp"
+#include "CudaFramework/Kernels/JORProxVel/BodyInitKernel/BodyInitKernelWrap.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/Reduction.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/ReductionKernelWrap.hpp"
 
 
 

@@ -1,7 +1,7 @@
 #ifndef ContactIterationFunc_hpp
 #define ContactIterationFunc_hpp
 
-#include "GeneralStructs.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
 
 namespace ContIter{
 

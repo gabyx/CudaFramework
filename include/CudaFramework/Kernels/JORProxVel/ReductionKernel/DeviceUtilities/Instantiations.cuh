@@ -35,7 +35,7 @@
 # ifndef Instantiations_cuh
 # define Instantiations_cuh
 #include <cuda_runtime.h>
-#include "EnumsDevice.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceUtilities/EnumsDevice.cuh"
 // #include "device/deviceutil.cuh"  THIERRY
 
 namespace ReductionGPU {

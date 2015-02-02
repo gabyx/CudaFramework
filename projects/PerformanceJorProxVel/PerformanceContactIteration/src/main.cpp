@@ -9,19 +9,19 @@
 #include <chrono>
 #include <iostream>
 
-#include "CudaError.hpp"
-#include "ContactIterationKernelWrap.hpp"
-#include "ContactIteration.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactIterationKernel/ContactIterationKernelWrap.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactIterationKernel/ContactIteration.hpp"
 
 
-#include "CudaMatrixUtilities.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
 
-#include "PerformanceTest.hpp"
+#include "CudaFramework/PerformanceTest/PerformanceTest.hpp"
 
 
 
-//#include "PerformanceTest.hpp"
+//#include "CudaFramework/PerformanceTest/PerformanceTest.hpp"
 ////////////////////////////////////////////////////////////////////////////////
 // Cuda extern C includes
 

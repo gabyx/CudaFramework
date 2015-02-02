@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include "Utilities.hpp"
-#include "CudaMatrixUtilities.hpp"
-#include "GeneralStructs.hpp"
-#include "BodyInitFunc.hpp"
+#include "CudaFramework/General/Utilities.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
+#include "CudaFramework/Kernels/JORProxVel/BodyInitKernel/BodyInitFunc.hpp"
 
 template<typename TSettings >
 BodyInitTestVariant<TSettings>::BodyInitTestVariant() {

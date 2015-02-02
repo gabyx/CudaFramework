@@ -8,17 +8,17 @@
 #include <random>
 
 #include <boost/format.hpp>
-#include "CudaMatrixUtilities.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
 
-#include "AssertionDebug.hpp"
-#include "CudaError.hpp"
+#include "CudaFramework/General/AssertionDebug.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
 #include <Eigen/Dense>
-#include "ConvergenceCheckKernelWrap.hpp"
-#include "FloatingPointType.hpp"
-#include "CudaMatrix.hpp"
-#include "GPUBufferOffsets.hpp"
-#include "VariantLaunchSettings.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ConvergenceCheckKernel/ConvergenceCheckKernelWrap.hpp"
+#include "CudaFramework/General/FloatingPointType.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/VariantLaunchSettings.hpp"
 
 //Prototyp
 template<typename PREC, unsigned int TVariantId> class ConvCheckGPUVariant;
@@ -182,6 +182,10 @@ public:
 public:
 
     void initialize(std::ostream * pLog, std::ostream * pData);
+
+    /** Check settings at runtime, static settings are already checked at compile time*/
+    bool checkSettings(int gpuID){WARNINGMSG(false,"checkSettings not correctly implemented!"); return true;}
+
     bool generateNextTestProblem();
     bool generateNextRandomRun();
 
@@ -225,7 +229,7 @@ std::vector<std::string>
 };
 
 // TODO -hpp -> .icc
-#include "ConvergenceCheck.icc"
+#include "CudaFramework/Kernels/JORProxVel/ConvergenceCheckKernel/ConvergenceCheck.icc"
 
 
 /**
@@ -390,7 +394,7 @@ typedef Eigen::Matrix<unsigned int,Eigen::Dynamic, Eigen::Dynamic,Eigen::ColMajo
 
         CHECK_CUDA(cudaEventRecord(start,0));
 
-        CHECK_CUDA(utilCuda::copyMatrixToHost(outputMatrixGPU,m_outDev,time));
+        CHECK_CUDA(utilCuda::copyMatrixToHost(outputMatrixGPU,m_outDev));
 
         CHECK_CUDA(cudaEventRecord(stop,0));
         CHECK_CUDA(cudaEventSynchronize(stop));

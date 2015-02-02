@@ -8,24 +8,24 @@
 #include <random>
 
 #include <boost/format.hpp>
-#include "CudaMatrixUtilities.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
 
-#include "AssertionDebug.hpp"
-#include "MyMatrixDefs.hpp"
+#include "CudaFramework/General/AssertionDebug.hpp"
+//#include "MyMatrixDefs.hpp"
 
-#include "CudaError.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
 #include <Eigen/Dense>
 
-#include "FloatingPointType.hpp"
-#include "CudaMatrix.hpp"
+#include "CudaFramework/General/FloatingPointType.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
 
-#include "GPUBufferOffsets.hpp"
-#include "GeneralStructs.hpp"
-#include "VariantLaunchSettings.hpp"
-#include "JORProxVelGPU.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
+#include "CudaFramework/Kernels/JORProxVel/VariantLaunchSettings.hpp"
+#include "CudaFramework/Kernels/JORProxVel/JORProxVelKernel/JORProxVelGPU.hpp"
 
-#include "GenRandomContactGraphClass.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GenRandomContactGraphClass.hpp"
 
 
 
@@ -269,7 +269,7 @@ std::vector<std::string>
 
 };
 
-#include "JORProxVel.icc"
+#include "CudaFramework/Kernels/JORProxVel/JORProxVelKernel/JORProxVel.icc"
 
 /**
 * @brief GPUTestVariant which computes a contact frame for all contacts.

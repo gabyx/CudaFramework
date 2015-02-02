@@ -1,7 +1,7 @@
 #ifndef DeviceIntrinsics_cuh
 #define DeviceIntrinsics_cuh
 
-#include "UtilitiesMatrixVector.cuh"
+#include "CudaFramework/Kernels/JORProxVel/UtilitiesMatrixVector.cuh"
 
 struct Default{};
     template<bool OnlyIfVariantIsSame, typename _M, typename _D> struct ManualOrDefault;

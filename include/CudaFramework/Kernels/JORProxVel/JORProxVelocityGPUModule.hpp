@@ -8,11 +8,11 @@
 #include "LogDefines.hpp"
 
 #include "CollisionData.hpp"
-#include "GPUBufferLoadStore.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferLoadStore.hpp"
 
 #include "ContactGraphNodeData.hpp"
 
-#include "JORProxVelGPU.hpp"
+#include "CudaFramework/Kernels/JORProxVel/JORProxVelKernel/JORProxVelGPU.hpp"
 
 
 class JorProxVelocityGPUModule{

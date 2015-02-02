@@ -1,13 +1,13 @@
 #ifndef ConvCheck_icc
 #define ConvCheck_icc
 
-#include "Utilities.hpp"
-#include "CudaMatrixUtilities.hpp"
+#include "CudaFramework/General/Utilities.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
-#include "GenRandomContactGraphClass.hpp"
-#include "GeneralStructs.hpp"
-#include "ConvergenceCheckFunc.hpp"
-#include "LoadingCPUBuffers.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GenRandomContactGraphClass.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ConvergenceCheckKernel/ConvergenceCheckFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/LoadingCPUBuffers.hpp"
 
 template<typename TSettings >
 ConvCheckTestVariant<TSettings>::ConvCheckTestVariant() {

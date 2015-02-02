@@ -3,9 +3,9 @@
 
 
 #include <cuda_runtime.h>
-#include "CudaError.hpp"
-#include "CudaMatrix.hpp"
-#include "DeviceIntrinsics.cuh"
+#include "CudaFramework/CudaModern/CudaError.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
+#include "CudaFramework/Kernels/JORProxVel/DeviceIntrinsics.cuh"
 
 
 namespace MatVecUtil {

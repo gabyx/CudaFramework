@@ -38,16 +38,16 @@
 
 #include <cuda_runtime.h>
 
-#include "CudaError.hpp"
+#include "CudaFramework/CudaModern/CudaError.hpp"
 
-#include "GPUDefines.cuh"
-#include "EnumsDevice.cuh"
-#include "BinarySearch.cuh"
-#include "DeviceOp.cuh"
-#include "Tuning.hpp"
-#include "Loadstore.cuh"
-#include "CTAReduce.cuh"
-#include "Enum.h"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceUtilities/GPUDefines.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceUtilities/EnumsDevice.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceFunctions/BinarySearch.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceUtilities/DeviceOp.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/HostUtilities/Tuning.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceUtilities/Loadstore.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceFunctions/CTAReduce.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/Enum.h"
 
 
 namespace ReductionGPU {

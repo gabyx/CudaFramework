@@ -1,7 +1,7 @@
 #include <cuda_runtime.h>
 #include <ContactIteration.cuh>
 
-#include "CudaMatrix.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
 
 #define PREC double
 template __host__ void  ContIter::contIterKernelWrap<false,true>( utilCuda::CudaMatrix<PREC> bodyBuffer,

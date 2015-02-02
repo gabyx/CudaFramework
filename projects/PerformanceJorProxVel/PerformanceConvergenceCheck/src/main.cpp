@@ -9,14 +9,14 @@
 #include <chrono>
 #include <iostream>
 
-#include "ConvergenceCheck.hpp"
-//#include "ContactIteration.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ConvergenceCheckKernel/ConvergenceCheck.hpp"
+//#include "CudaFramework/Kernels/JORProxVel/ContactIterationKernel/ContactIteration.hpp"
 
-#include "PerformanceTest.hpp"
+#include "CudaFramework/PerformanceTest/PerformanceTest.hpp"
 
 
 
-//#include "PerformanceTest.hpp"
+//#include "CudaFramework/PerformanceTest/PerformanceTest.hpp"
 ////////////////////////////////////////////////////////////////////////////////
 // Cuda extern C includes
 

@@ -37,7 +37,7 @@
 
 #include <cuda_runtime.h>
 
-#include "EnumsDevice.cuh"
+#include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceUtilities/EnumsDevice.cuh"
 
 namespace ReductionGPU {
 

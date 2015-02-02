@@ -9,16 +9,16 @@
 
 #include <boost/format.hpp>
 
-#include "CudaMatrixUtilities.hpp"
-#include "CudaMatrix.hpp"
-#include "CudaPrint.hpp"
-#include "GPUBufferOffsets.hpp"
-#include "GeneralStructs.hpp"
-#include "VariantLaunchSettings.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
+#include "CudaFramework/CudaModern/CudaPrint.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
+#include "CudaFramework/Kernels/JORProxVel/VariantLaunchSettings.hpp"
 
 
 
-#include "JORProxVelKernelWrap.hpp"
+#include "CudaFramework/Kernels/JORProxVel/JORProxVelKernel/JORProxVelKernelWrap.hpp"
 
 
 

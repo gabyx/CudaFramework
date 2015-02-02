@@ -1,7 +1,7 @@
 #include <cuda_runtime.h>
 #include <ConvergenceCheck.cuh>
 
-#include "CudaMatrix.hpp"
+#include "CudaFramework/CudaModern/CudaMatrix.hpp"
 
 #define PREC double
 template __host__ void  ConvCheck::convCheckKernelWrap<false,true,PREC>(utilCuda::CudaMatrix<PREC> bodyBuffer,
