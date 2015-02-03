@@ -33,8 +33,8 @@
  ******************************************************************************/
 
 //#define STATIC_ASSERT(COND,MSG) typedef char static_assertion_##MSG[(COND)?1:-1]
-#ifndef ReductionKernelWrap_hpp
-#define ReductionKernelWrap_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_ReductionKernelWrap_hpp
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_ReductionKernelWrap_hpp
 
 #include "CudaFramework/CudaModern/CudaContext.hpp"
 #include "CudaFramework/CudaModern/CudaTypeDefs.hpp"

@@ -1,5 +1,5 @@
-#ifndef ConvergenceCheckFunc_hpp
-#define ConvergenceCheckFunc_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ConvergenceCheckKernel_ConvergenceCheckFunc_hpp
+#define CudaFramework_Kernels_JORProxVel_ConvergenceCheckKernel_ConvergenceCheckFunc_hpp
 namespace ConvCheck{
 
 

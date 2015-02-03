@@ -1,6 +1,6 @@
 
-#ifndef JORProxVelKernelWrap_hpp
-#define JORProxVelKernelWrap_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_JORProxVelKernel_JORProxVelKernelWrap_hpp
+#define CudaFramework_Kernels_JORProxVel_JORProxVelKernel_JORProxVelKernelWrap_hpp
 
 #include <cmath>
 #include <iostream>

@@ -1,6 +1,6 @@
 
-#ifndef ContactKernelFrameKernel_hpp
-#define ContactKernelFrameKernel_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ContactInitKernel_ContactInitKernelWrap_hpp
+#define CudaFramework_Kernels_JORProxVel_ContactInitKernel_ContactInitKernelWrap_hpp
 
 #include <cmath>
 #include <iostream>

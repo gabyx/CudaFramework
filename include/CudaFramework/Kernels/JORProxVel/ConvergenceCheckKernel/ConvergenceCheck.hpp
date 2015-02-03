@@ -1,5 +1,5 @@
-#ifndef ConvergenceCheck_hpp
-#define ConvergenceCheck_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ConvergenceCheckKernel_ConvergenceCheck_hpp
+#define CudaFramework_Kernels_JORProxVel_ConvergenceCheckKernel_ConvergenceCheck_hpp
 
 #include <iostream>
 #include <cmath>

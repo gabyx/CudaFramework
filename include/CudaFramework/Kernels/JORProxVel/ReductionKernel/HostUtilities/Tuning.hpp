@@ -31,8 +31,8 @@
  * See http://nvlabs.github.io/moderngpu for repository and documentation.
  *
  ******************************************************************************/
-# ifndef Tuning_hpp
-# define Tuning_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_HostUtilities_Tuning_hpp
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_HostUtilities_Tuning_hpp
 
 #include <cuda_runtime.h>
 

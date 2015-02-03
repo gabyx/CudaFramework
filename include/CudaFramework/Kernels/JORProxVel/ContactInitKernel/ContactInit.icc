@@ -1,5 +1,5 @@
-#ifndef ContactInit_icc
-#define ContactInit_icc
+#ifndef CudaFramework_Kernels_JORProxVel_ContactInitKernel_ContactInit_icc
+#define CudaFramework_Kernels_JORProxVel_ContactInitKernel_ContactInit_icc
 #include <iomanip>
 #include "CudaFramework/General/Utilities.hpp"
 

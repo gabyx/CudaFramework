@@ -1,5 +1,5 @@
-#ifndef JORProxVelocityGPUModule_hpp
-#define JORProxVelocityGPUModule_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_JORProxVelocityGPUModule_hpp
+#define CudaFramework_Kernels_JORProxVel_JORProxVelocityGPUModule_hpp
 
 #include <vector>
 #include <unordered_map>

@@ -1,6 +1,6 @@
 
-#ifndef BodyInitKernelWrap_hpp
-#define BodyInitKernelWrap_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_BodyInitKernel_BodyInitKernelWrap_hpp
+#define CudaFramework_Kernels_JORProxVel_BodyInitKernel_BodyInitKernelWrap_hpp
 
 
 /// Declaration for GCC

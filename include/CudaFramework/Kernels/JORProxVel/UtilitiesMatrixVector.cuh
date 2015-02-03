@@ -1,5 +1,5 @@
-#ifndef UtilitiesMatrixVector_cuh
-#define UtilitiesMatrixVector_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_UtilitiesMatrixVector_cuh
+#define CudaFramework_Kernels_JORProxVel_UtilitiesMatrixVector_cuh
 
 
 #include <cuda_runtime.h>

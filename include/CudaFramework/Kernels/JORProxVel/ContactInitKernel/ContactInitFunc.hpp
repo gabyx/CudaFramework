@@ -1,5 +1,5 @@
-#ifndef ContactInitFunc_hpp
-#define ContactInitFunc_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ContactInitKernel_ContactInitFunc_hpp
+#define CudaFramework_Kernels_JORProxVel_ContactInitKernel_ContactInitFunc_hpp
 #include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
 #include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
 

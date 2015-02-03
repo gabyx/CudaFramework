@@ -32,8 +32,8 @@
  * See http://nvlabs.github.io/moderngpu for repository and documentation.
  *
  ******************************************************************************/
-# ifndef PartitionKernel_cuh
-# define PartitionKernel_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_KernelsWrappers_PartitionKernel_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_KernelsWrappers_PartitionKernel_cuh
 
 
 #include <cuda_runtime.h>

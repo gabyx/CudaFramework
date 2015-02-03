@@ -32,8 +32,8 @@
  *
  ******************************************************************************/
 
-#ifndef ReduceSpineKernels_cuh
-#define ReduceSpineKernels_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_KernelsWrappers_ReduceSpineKernels_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_KernelsWrappers_ReduceSpineKernels_cuh
 
 #include "DeviceUtilities/GPUDefines.cuh"
 #include "DeviceUtilities/DeviceOp.cuh"

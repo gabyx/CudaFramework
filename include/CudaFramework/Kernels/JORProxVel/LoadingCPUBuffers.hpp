@@ -1,6 +1,6 @@
 
-#ifndef LoadingCPUBuffers_hpp
-#define LoadingCPUBuffers_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_LoadingCPUBuffers_hpp
+#define CudaFramework_Kernels_JORProxVel_LoadingCPUBuffers_hpp
 
 #include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
 #include "CudaFramework/General/AssertionDebug.hpp"

@@ -1,5 +1,5 @@
-#ifndef ContactInit_hpp
-#define ContactInit_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ContactInitKernel_ContactInit_hpp
+#define CudaFramework_Kernels_JORProxVel_ContactInitKernel_ContactInit_hpp
 
 #include <cmath>
 #include <cstdlib>

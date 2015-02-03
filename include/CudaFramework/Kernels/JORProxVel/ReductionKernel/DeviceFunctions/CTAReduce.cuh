@@ -33,8 +33,8 @@
  ******************************************************************************/
 
 
-#ifndef CTAReduce_cuh
-#define CTAReduce_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceFunctions_CTAReduce_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceFunctions_CTAReduce_cuh
 
 
 #include <cuda_runtime.h>

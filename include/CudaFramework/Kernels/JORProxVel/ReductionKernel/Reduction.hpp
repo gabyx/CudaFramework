@@ -34,8 +34,8 @@
 
 
 
-#ifndef Reduction_hpp
-#define Reduction_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_Reduction_hpp
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_Reduction_hpp
 
 
 #include "CudaFramework/Kernels/JORProxVel/ReductionKernel/ReductionKernelWrap.hpp"

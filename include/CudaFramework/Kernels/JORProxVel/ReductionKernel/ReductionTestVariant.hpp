@@ -1,5 +1,5 @@
-#ifndef ReductionTestVariant_hpp
-#define ReductionTestVariant_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_ReductionTestVariant_hpp
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_ReductionTestVariant_hpp
 
 #include <cmath>
 #include <cstdlib>

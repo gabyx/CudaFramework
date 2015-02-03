@@ -32,8 +32,8 @@
  *
  ******************************************************************************/
 
-# ifndef BinarySearch_cuh
-# define BinarySearch_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceFunctions_BinarySearch_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceFunctions_BinarySearch_cuh
 
 #include <cuda_runtime.h>
 

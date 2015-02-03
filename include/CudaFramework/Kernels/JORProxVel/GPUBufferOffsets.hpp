@@ -1,6 +1,6 @@
 
-#ifndef GPUBufferOffsets_hpp
-#define GPUBufferOffsets_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_GPUBufferOffsets_hpp
+#define CudaFramework_Kernels_JORProxVel_GPUBufferOffsets_hpp
 
 
 #define DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES \

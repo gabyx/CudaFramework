@@ -31,8 +31,8 @@
  * See http://nvlabs.github.io/moderngpu for repository and documentation.
  *
  ******************************************************************************/
-# ifndef DeviceOp_cuh
-# define DeviceOp_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_DeviceOp_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_DeviceOp_cuh
 
 #pragma once
 #include <cuda_runtime.h>

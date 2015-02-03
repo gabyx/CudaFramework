@@ -1,6 +1,6 @@
 
-#ifndef ConvergenceCheckKernelWrap_hpp
-#define ConvergenceCheckKernelWrap_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ConvergenceCheckKernel_ConvergenceCheckKernelWrap_hpp
+#define CudaFramework_Kernels_JORProxVel_ConvergenceCheckKernel_ConvergenceCheckKernelWrap_hpp
 
 #include <cmath>
 #include <iostream>

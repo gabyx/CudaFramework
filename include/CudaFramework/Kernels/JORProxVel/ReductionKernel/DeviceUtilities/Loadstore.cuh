@@ -32,8 +32,8 @@
  *
  ******************************************************************************/
 
-# ifndef loadstore_cuh
-# define loadstore_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_Loadstore_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_Loadstore_cuh
 
 #include <cuda_runtime.h>
 #include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceUtilities/Instantiations.cuh"

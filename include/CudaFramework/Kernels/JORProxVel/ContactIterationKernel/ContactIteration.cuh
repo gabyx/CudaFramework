@@ -1,5 +1,5 @@
-#ifndef ContactIteration_cuh
-#define ContactIteration_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ContactIterationKernel_ContactIteration_cuh
+#define CudaFramework_Kernels_JORProxVel_ContactIterationKernel_ContactIteration_cuh
 
 
 

@@ -1,6 +1,6 @@
 
-#ifndef GPUBufferLoadStore_hpp
-#define GPUBufferLoadStore_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_GPUBufferLoadStore_hpp
+#define CudaFramework_Kernels_JORProxVel_GPUBufferLoadStore_hpp
 
 #include <type_traits>
 #include "TypeDefs.hpp"

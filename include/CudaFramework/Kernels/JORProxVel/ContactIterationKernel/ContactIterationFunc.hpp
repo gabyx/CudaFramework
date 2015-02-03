@@ -1,5 +1,5 @@
-#ifndef ContactIterationFunc_hpp
-#define ContactIterationFunc_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ContactIterationKernel_ContactIterationFunc_hpp
+#define CudaFramework_Kernels_JORProxVel_ContactIterationKernel_ContactIterationFunc_hpp
 
 #include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
 

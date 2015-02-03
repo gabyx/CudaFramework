@@ -1,5 +1,5 @@
-#ifndef ReductionTestVariant_icc
-#define ReductionTestVariant_icc
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_ReductionTestVariant_icc
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_ReductionTestVariant_icc
 
 #include "CudaFramework/General/Utilities.hpp"
 

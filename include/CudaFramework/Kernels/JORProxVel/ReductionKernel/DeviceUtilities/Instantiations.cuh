@@ -32,8 +32,8 @@
  *
  ******************************************************************************/
 
-# ifndef Instantiations_cuh
-# define Instantiations_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_Instantiations_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_Instantiations_cuh
 #include <cuda_runtime.h>
 #include "CudaFramework/Kernels/JORProxVel/ReductionKernel/DeviceUtilities/EnumsDevice.cuh"
 // #include "device/deviceutil.cuh"  THIERRY

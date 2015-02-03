@@ -1,5 +1,5 @@
-#ifndef ContactIteration_icc
-#define ContactIteration_icc
+#ifndef CudaFramework_Kernels_JORProxVel_ContactIterationKernel_ContactIteration_icc
+#define CudaFramework_Kernels_JORProxVel_ContactIterationKernel_ContactIteration_icc
 
 #include "CudaFramework/General/Utilities.hpp"
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"

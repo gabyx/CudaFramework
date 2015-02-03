@@ -1,5 +1,5 @@
-#ifndef JORProxVel_hpp
-#define JORProxVel_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_JORProxVelKernel_JORProxVel_hpp
+#define CudaFramework_Kernels_JORProxVel_JORProxVelKernel_JORProxVel_hpp
 
 #include <iostream>
 #include <cmath>

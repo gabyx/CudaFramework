@@ -1,5 +1,5 @@
-#ifndef BodyInitFunc_hpp
-#define BodyInitFunc_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_BodyInitKernel_BodyInitFunc_hpp
+#define CudaFramework_Kernels_JORProxVel_BodyInitKernel_BodyInitFunc_hpp
 
 #include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
 #include "CudaFramework/General/AssertionDebug.hpp"

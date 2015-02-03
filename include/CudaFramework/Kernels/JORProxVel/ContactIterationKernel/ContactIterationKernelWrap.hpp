@@ -1,6 +1,6 @@
 
-#ifndef ContactIterationKernelWrap_hpp
-#define ContactIterationKernelWrap_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ContactIterationKernel_ContactIterationKernelWrap_hpp
+#define CudaFramework_Kernels_JORProxVel_ContactIterationKernel_ContactIterationKernelWrap_hpp
 
 #include <cmath>
 #include <iostream>

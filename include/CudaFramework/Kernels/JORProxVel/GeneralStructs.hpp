@@ -1,6 +1,6 @@
 
-#ifndef GeneralStructs_hpp
-#define GeneralStructs_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_GeneralStructs_hpp
+#define CudaFramework_Kernels_JORProxVel_GeneralStructs_hpp
 
 
 

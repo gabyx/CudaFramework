@@ -1,5 +1,5 @@
-#ifndef ConvCheck_icc
-#define ConvCheck_icc
+#ifndef CudaFramework_Kernels_JORProxVel_ConvergenceCheckKernel_ConvergenceCheck_icc
+#define CudaFramework_Kernels_JORProxVel_ConvergenceCheckKernel_ConvergenceCheck_icc
 
 #include "CudaFramework/General/Utilities.hpp"
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"

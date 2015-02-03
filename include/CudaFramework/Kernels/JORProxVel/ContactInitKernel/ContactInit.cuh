@@ -1,5 +1,5 @@
-#ifndef ContactInit_cuh
-#define ContactInit_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ContactInitKernel_ContactInit_cuh
+#define CudaFramework_Kernels_JORProxVel_ContactInitKernel_ContactInit_cuh
 
 
 

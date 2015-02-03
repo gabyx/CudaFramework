@@ -31,8 +31,8 @@
  * See http://nvlabs.github.io/moderngpu for repository and documentation.
  *
  ******************************************************************************/
-# ifndef GPUDefines_cuh
-# define GPUDefines_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_GPUDefines_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_GPUDefines_cuh
 
 namespace ReductionGPU {
 #ifndef MGPU_MIN

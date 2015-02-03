@@ -1,5 +1,5 @@
-#ifndef BodyInit_cuh
-#define BodyInit_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_BodyInitKernel_BodyInit_cuh
+#define CudaFramework_Kernels_JORProxVel_BodyInitKernel_BodyInit_cuh
 
 
 

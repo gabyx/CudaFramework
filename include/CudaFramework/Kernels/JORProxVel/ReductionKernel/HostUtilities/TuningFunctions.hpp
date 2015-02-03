@@ -33,8 +33,8 @@
  *
  ******************************************************************************/
 
-# ifndef TuningFunctions_hpp
-# define TuningFunctions_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_HostUtilities_TuningFunctions_hpp
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_HostUtilities_TuningFunctions_hpp
 
 #include <cuda_runtime.h>
 

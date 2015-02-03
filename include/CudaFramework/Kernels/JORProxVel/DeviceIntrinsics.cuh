@@ -1,5 +1,5 @@
-#ifndef DeviceIntrinsics_cuh
-#define DeviceIntrinsics_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_DeviceIntrinsics_cuh
+#define CudaFramework_Kernels_JORProxVel_DeviceIntrinsics_cuh
 
 #include "CudaFramework/Kernels/JORProxVel/UtilitiesMatrixVector.cuh"
 

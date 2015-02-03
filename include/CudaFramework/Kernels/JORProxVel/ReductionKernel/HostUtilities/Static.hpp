@@ -31,8 +31,8 @@
  * See http://nvlabs.github.io/moderngpu for repository and documentation.
  *
  ******************************************************************************/
-# ifndef Static_hpp
-# define Static_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_HostUtilities_Static_hpp
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_HostUtilities_Static_hpp
 
 #ifndef MGPU_MIN
 #define MGPU_MIN(x, y) (((x) <= (y)) ? (x) : (y))

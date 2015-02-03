@@ -1,5 +1,5 @@
-#ifndef BodyInit_icc
-#define BodyInit_icc
+#ifndef CudaFramework_Kernels_JORProxVel_BodyInitKernel_BodyInit_icc
+#define CudaFramework_Kernels_JORProxVel_BodyInitKernel_BodyInit_icc
 
 #include <vector>
 #include <tinyformat/TinyFormatInclude.hpp>

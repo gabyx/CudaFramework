@@ -1,5 +1,5 @@
-#ifndef ContactIteration_hpp
-#define ContactIteration_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_ContactIterationKernel_ContactIteration_hpp
+#define CudaFramework_Kernels_JORProxVel_ContactIterationKernel_ContactIteration_hpp
 
 #include <iostream>
 #include <cmath>

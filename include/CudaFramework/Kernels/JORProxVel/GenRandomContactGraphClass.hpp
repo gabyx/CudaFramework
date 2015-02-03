@@ -1,6 +1,6 @@
 
-#ifndef GenRandomContactsGraph
-#define GenRandomContactsGraph
+#ifndef CudaFramework_Kernels_JORProxVel_GenRandomContactGraphClass_hpp
+#define CudaFramework_Kernels_JORProxVel_GenRandomContactGraphClass_hpp
 
 #include <iostream>
 #include <vector>

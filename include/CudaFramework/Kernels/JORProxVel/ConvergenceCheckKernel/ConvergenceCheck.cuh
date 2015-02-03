@@ -1,5 +1,5 @@
-#ifndef ConvergenceCheck_cuh
-#define ConvergenceCheck_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ConvergenceCheckKernel_ConvergenceCheck_cuh
+#define CudaFramework_Kernels_JORProxVel_ConvergenceCheckKernel_ConvergenceCheck_cuh
 
 
 

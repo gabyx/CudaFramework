@@ -31,8 +31,8 @@
  * See http://nvlabs.github.io/moderngpu for repository and documentation.
  *
  ******************************************************************************/
-# ifndef enums_cuh
-# define enums_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_EnumsDevice_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_EnumsDevice_cuh
 namespace ReductionGPU {
 
 

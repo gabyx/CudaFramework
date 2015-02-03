@@ -32,8 +32,8 @@
  * See http://nvlabs.github.io/moderngpu for repository and documentation.
  *
  ******************************************************************************/
-# ifndef ReductionKernel_cuh
-# define ReductionKernel_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_KernelsWrappers_ReductionKernel_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_KernelsWrappers_ReductionKernel_cuh
 
 
 #include <cuda_runtime.h>

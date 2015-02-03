@@ -1,5 +1,5 @@
-#ifndef BodyInit_hpp
-#define BodyInit_hpp
+#ifndef CudaFramework_Kernels_JORProxVel_BodyInitKernel_BodyInit_hpp
+#define CudaFramework_Kernels_JORProxVel_BodyInitKernel_BodyInit_hpp
 
 #include <cmath>
 #include <cstdlib>

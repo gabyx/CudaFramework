@@ -31,8 +31,8 @@
  * See http://nvlabs.github.io/moderngpu for repository and documentation.
  *
  ******************************************************************************/
-# ifndef Intrinsics_cuh
-# define Intrinsics_cuh
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_Intrinsics_cuh
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_DeviceUtilities_Intrinsics_cuh
 
 //#include "../deviceutilities/devicetypes.cuh"
 #include <cuda_runtime.h>
