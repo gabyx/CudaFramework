@@ -163,7 +163,8 @@ and is closely related to the implementation of
 
 > Million Body Simulations of Granular Dynamics on the GPU,” H. Mazhar, T. Heyn, A. Tasora, M. Anitescu, D. Negrut, accepted, SIAM Conference on Computational Science and Engineering, Reno, NV, 2011
 
-We used speciali designed segmented reduction kernel adapted from [ModernGPU](http://www.moderngpu.com).
+We used a specialized segmented reduction kernel adapted from [ModernGPU](http://www.moderngpu.com) for the velocity update of the bodies.
+
 Tutorial to come!
 
 
