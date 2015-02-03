@@ -2,7 +2,7 @@
 //  CudaFramework
 //  Copyright (C) 2014 by Gabriel Nützi <nuetzig (at) imes (d0t) mavt (d0t) ethz (d0t) ch>
 //
-//  This Source Code Form is subject to the terms of the GNU GPL 3.0 licence. 
+//  This Source Code Form is subject to the terms of the GNU GPL 3.0 licence.
 //  If a copy of the GNU GPL 3.0 was not distributed with this
 //  file, you can obtain one at http://opensource.org/licenses/GPL-3.0.
 // ========================================================================================
@@ -334,9 +334,7 @@ void ContactInitTestVariant<VariantLaunchSettings >::checkResults() {
 
 template<typename VariantLaunchSettings >
 void ContactInitTestVariant<VariantLaunchSettings >::writeData() {
-       using namespace boost;
-       *m_pData << boost::format("%1$.9d\t")
-            % m_nContacts;
+        *m_pData << tinyformat::format("%d\t",m_nContacts);
 }
 
 template<typename VariantLaunchSettings >
