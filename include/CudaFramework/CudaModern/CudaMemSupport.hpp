@@ -23,7 +23,7 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* 
+*
 *  Source code modified and extended from moderngpu.com
 ******************************************************************************/
 
@@ -31,6 +31,7 @@
 #define CudaFramework_CudaModern_CudaMemSupport_hpp
 
 #include <cassert>
+#include <type_traits>
 #include <algorithm>
 #include <random>
 
@@ -88,6 +89,29 @@ namespace utilCuda{
     protected:
         CudaMemSupport() { }
         AllocPtrType m_alloc;
+
+        template<typename VectorData,
+                 typename T,
+                 typename std::enable_if< std::is_integral<T>::value , void* >::type = nullptr>
+        void fillUniform_impl(VectorData & data, T min, T max){
+            RandomGenerator generator;
+            std::uniform_int_distribution<T> distribution(min,max);
+            for( auto & d : data){
+                d = distribution(generator);
+            }
+        }
+
+        template<typename VectorData,
+                 typename T,
+                 typename std::enable_if< std::is_floating_point<T>::value , void* >::type = nullptr>
+        void fillUniform_impl(VectorData & data, size_t count, T min, T max){
+            RandomGenerator generator;
+            std::uniform_real_distribution<T> distribution(min,max);
+            for( auto & d : data){
+                d = distribution(generator);
+            }
+        }
+
     };
 
 
@@ -142,13 +166,7 @@ DeviceMemPtr<T> CudaMemSupport::fillAscending(size_t count, T first, T step) {
 template<typename T>
 DeviceMemPtr<T> CudaMemSupport::genRandom(size_t count, T min, T max) {
 	std::vector<T> data(count);
-
-	RandomGenerator generator;
-    std::uniform_int_distribution<T> distribution(min,max);
-
-	for(size_t i = 0; i < count; ++i)
-		data[i] = distribution(generator);
-
+	fillUniform_impl(data,min,max);
 	return malloc(data);
 }
 
@@ -156,11 +174,7 @@ template<typename T>
 DeviceMemPtr<T> CudaMemSupport::sortRandom(size_t count, T min, T max) {
 	std::vector<T> data(count);
 
-	RandomGenerator generator;
-    std::uniform_int_distribution<T> distribution(min,max);
-
-	for(size_t i = 0; i < count; ++i)
-		data[i] = distribution(generator);
+	fillUniform_impl(data,min,max);
 
 	std::sort(data.begin(), data.end());
 	return malloc(data);

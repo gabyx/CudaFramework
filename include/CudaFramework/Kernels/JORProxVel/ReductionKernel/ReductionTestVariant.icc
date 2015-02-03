@@ -1,0 +1,295 @@
+// ========================================================================================
+//  CudaFramework
+//  Copyright (C) 2014 by Gabriel Nützi <nuetzig (at) imes (d0t) mavt (d0t) ethz (d0t) ch>
+//
+//  This Source Code Form is subject to the terms of the GNU GPL 3.0 licence. 
+//  If a copy of the GNU GPL 3.0 was not distributed with this
+//  file, you can obtain one at http://opensource.org/licenses/GPL-3.0.
+// ========================================================================================
+
+#ifndef CudaFramework_Kernels_JORProxVel_ReductionKernel_ReductionTestVariant_icc
+#define CudaFramework_Kernels_JORProxVel_ReductionKernel_ReductionTestVariant_icc
+
+#include "CudaFramework/General/Utilities.hpp"
+
+template<typename VariantLaunchSettings >
+ReductionTestVariant<VariantLaunchSettings>::ReductionTestVariant() {
+
+    m_nContacts=0;
+    m_nContactCounter=0;
+    m_nRandomRunsCounter=0;
+
+    numberOfContacts = 0;
+
+}
+
+template<typename PREC>
+void sum(PREC start,int length,PREC output) {
+    output[0]=0;
+    for (int i=0; i<length; i++) {
+
+        output[0]+=start[i];
+    }
+}
+
+template<typename VariantLaunchSettings >
+void ReductionTestVariant<VariantLaunchSettings>::runOnCPU() {
+
+   PREC* beginptr;
+   PREC* endptr;
+   PREC* outputPtr;
+
+   auto begin = std::chrono::high_resolution_clock::now();
+   int Size=inputVectorGPU2.size();
+
+
+    beginptr = &(inputVectorCPU[0]);
+    endptr = &(inputVectorCPU[0]);
+    outputPtr = &(outputVectorCPU[0]);
+
+   for(int i=0; i < (inputVectorGPU2.size()-1);i++)
+   {
+       sum(beginptr+inputVectorCPU2[i],
+           inputVectorCPU2[i+1]-inputVectorCPU2[i],
+           outputPtr+i);
+   }
+    sum(beginptr+inputVectorCPU2[Size-1],numberOfContacts-inputVectorCPU2[Size-1],outputPtr+Size-1);
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    auto dur = end - begin;
+    m_cpuIterationTime = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+    *m_pLog <<"CPU time in ms: "<< m_cpuIterationTime << std::endl;
+
+
+
+};
+
+
+template<typename VariantLaunchSettings >
+bool ReductionTestVariant<VariantLaunchSettings>::isequal(PREC a,
+                                                        PREC b) {
+    return(std::abs(std::abs(a)-std::abs(b))<Tolerance);
+}
+
+template<typename VariantLaunchSettings >
+bool ReductionTestVariant<VariantLaunchSettings>::compareoutput() {
+    bool isconverged = true;
+
+        for(unsigned int i=0; i < inputVectorGPU2.size(); i++) {
+
+            isconverged=isconverged&&isequal(outputVectorCPU[i],outputVectorGPU[i]);
+            if(isconverged==false) {
+                *m_pLog<<"ERROR not the same results" <<std::endl;
+                *m_pLog<<"column number :  "<<i <<std::endl;
+                *m_pLog<<"CPU  "    <<outputVectorCPU[i]<<"GPU  "<<outputVectorGPU[i]<<std::endl;
+                isconverged=true;
+            }
+        }
+    return isconverged;
+}
+
+template<typename VariantLaunchSettings >
+void ReductionTestVariant<VariantLaunchSettings >:: initialize( std::ostream * pLog,
+                                                              std::ostream * pData) {
+
+    m_pData = pData;
+    m_pLog = pLog;
+    *m_pLog<<"initialize "<<std::endl;
+    m_nContactCounter =  ((int)(minNContacts + (stepNContacts -1 ) ) / stepNContacts) * stepNContacts ;
+
+    if(m_nContactCounter <=0) {
+        m_nContactCounter = stepNContacts;
+    }
+
+    m_nRandomRunsCounter =0;
+
+    std::srand ( (unsigned int)time(NULL) );
+
+    m_gpuVariant.initialize(m_pLog);
+
+}
+
+template<typename VariantLaunchSettings >
+bool ReductionTestVariant<VariantLaunchSettings >::generateNextTestProblem() {
+
+
+
+    RandomGeneratorType randGen(m_seed);
+    DistributionType distGen(1.0 , 3.0);
+
+    *m_pLog<<"generate next test problem"<<std::endl;
+
+    if(m_nContactCounter>maxNContacts) {
+        *m_pLog << "No more Test Problems to generate, --->exit ============="<<std::endl;
+        return false;
+    }
+
+
+    m_nContacts = m_nContactCounter;
+    *m_pLog << "Compute test for nContacts: "<< m_nContacts <<" ============="<<std::endl;
+
+
+    m_nOps = numberOfContacts*3*55;
+
+    m_nBytesReadWrite = 100;
+
+    // REsize matrices CPU memory
+    numberOfContacts=m_nContacts;
+
+    outputVectorGPU.resize(numberOfContacts);
+    outputVectorCPU.resize(numberOfContacts);
+
+    inputVectorGPU.resize(numberOfContacts);
+    inputVectorCPU.resize(numberOfContacts);
+
+
+    //reset randomRun
+    m_nRandomRunsCounter = 0;
+    *m_pLog<<"  gpu variant initialize test problem "<<  std::endl;
+
+    m_gpuVariant.initializeTestProblem( numberOfContacts,
+                                        inputVectorGPU,
+                                        inputVectorGPU2,
+                                        outputVectorGPU,
+                                        m_implementedLengthInput,
+                                        m_implementedLengthOutput);
+
+    // Increment counter
+    m_nContactCounter += stepNContacts;
+
+    return true;
+}
+
+template<typename VariantLaunchSettings >
+bool ReductionTestVariant<VariantLaunchSettings >::generateNextRandomRun() {
+
+    RandomGeneratorType randGen(m_nRandomRunsCounter);
+    DistributionType distGen(1.0 , 3.0);
+    *m_pLog<<"generate next random run"<<std::endl;
+    if(m_nRandomRunsCounter < maxNRandomRuns) {
+        m_nRandomRunsCounter++;
+    } else {
+        return false;
+    }
+
+    *m_pLog << "Random Run # : "<<m_nRandomRunsCounter<<std::endl;
+
+    // Set Values! ==============================
+
+
+    for(int z=0; z<numberOfContacts; z++) {
+
+        inputVectorGPU[z]= distGen(randGen);
+        inputVectorCPU[z]= inputVectorGPU[z];
+    }
+
+
+        /// initialisation of input data
+
+    inputVectorGPU2.resize(0);
+    std::uniform_int_distribution<int> dist(1,10);
+
+    int i = 0;
+    inputVectorGPU2.push_back(i);
+    while(true) {
+        i += dist(randGen);
+        if(i<numberOfContacts) {
+            inputVectorGPU2.push_back(i);
+        } else {
+            break;
+        }
+    }
+
+
+    inputVectorCPU2.resize(inputVectorGPU2.size());
+    for(int j=0; j<inputVectorGPU2.size(); j++) {
+        inputVectorCPU2[j]=inputVectorGPU2[j];
+    }
+
+    // ==========================================
+
+
+    return true;
+}
+
+template<typename VariantLaunchSettings >
+void ReductionTestVariant<VariantLaunchSettings >::checkResults() {
+
+    if(this->compareoutput()) {
+        *m_pLog<< "Results are Identical"<< std::endl;
+    }
+
+    double relTolGPUCPU = 1e-5;
+    unsigned int tolUlpGPUCPU = 20000;
+
+    bool b1,b2,b3,b4;
+    std::tie(b1,b2,b3,b4) = Utilities::compareArraysEachCombined(outputVectorGPU.data(),
+                                 outputVectorCPU.data(),
+                                 outputVectorCPU.size(),
+                                 relTolGPUCPU,
+                                 tolUlpGPUCPU,
+                                 m_maxRelTol,
+                                 m_avgRelTol,
+                                 m_maxUlp,
+                                 m_avgUlp,
+                                 false);
+
+
+
+    //TODO Eliminate warning???
+    if(b1 && b2 && b3 && b4 ){
+        *m_pLog << " ---> GPU/CPU identical!...." << std::endl;
+    }else{
+        *m_pLog << " ---> GPU/CPU NOT identical!...." << std::endl;
+    }
+        *m_pLog << " ---> Converged relTol: "<<b1  <<" \t Identical Ulp: "<< b2
+                << "      CPU finite: "<<b3  <<" \t GPU finite: "<< b4 << std::endl;
+
+
+
+
+    *m_pLog << " ---> maxUlp: " << (double)m_maxUlp << std::endl;
+    *m_pLog << " ---> avgUlp: " << m_avgUlp << std::endl;
+    *m_pLog << " ---> maxRelTol: " << m_maxRelTol << std::endl;
+    *m_pLog << " ---> avgRelTol: " << m_avgRelTol << std::endl;
+
+
+}
+
+template<typename VariantLaunchSettings >
+void ReductionTestVariant<VariantLaunchSettings >::writeData() {
+       *m_pData << tinyformat::format("%d\t",m_nContacts);
+}
+
+template<typename VariantLaunchSettings >
+void ReductionTestVariant<VariantLaunchSettings >::runOnGPU() {
+
+
+    *m_pLog<<"run on GPU entered"<<std::endl;
+
+
+    m_gpuVariant.run( numberOfContacts,
+                      inputVectorGPU,
+                      inputVectorGPU2,
+                      outputVectorGPU);
+
+    m_elapsedTimeCopyToGPU   = m_gpuVariant.m_elapsedTimeCopyToGPU;
+    m_elapsedTimeCopyFromGPU = m_gpuVariant.m_elapsedTimeCopyFromGPU;
+    m_gpuIterationTime       = m_gpuVariant.m_gpuIterationTime;
+
+}
+
+
+template<typename VariantLaunchSettings >
+void ReductionTestVariant<VariantLaunchSettings >::cleanUpTestProblem() {
+    /// m_gpuVariant.cleanUpTestProblem();
+
+    *m_pLog << "Entered the cleanup function "<<std::endl;
+}
+
+
+
+
+
+#endif

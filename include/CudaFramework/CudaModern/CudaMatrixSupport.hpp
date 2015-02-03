@@ -42,7 +42,7 @@ namespace utilCuda{
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* 
+*
 *  Source code modified and extended from moderngpu.com
 ******************************************************************************/
 
@@ -95,6 +95,13 @@ namespace utilCuda{
 
       return DevicePtr(A_dev);
    }
+
+
+    template<typename PREC, bool AlignMatrix, bool RowMajor=false, typename EigenMatrixType >
+    DeviceMatrixPtr<PREC,RowMajor > mallocMatrix(EigenMatrixType & m){
+        return mallocMatrix<PREC,AlignMatrix>(m.rows(),m.cols());
+    }
+
 
     protected:
         CudaMatrixSupport() :  CudaMemSupport() { }

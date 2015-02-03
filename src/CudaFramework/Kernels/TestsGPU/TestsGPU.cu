@@ -1,4 +1,13 @@
-﻿#include <stdio.h>
+// ========================================================================================
+//  CudaFramework
+//  Copyright (C) 2014 by Gabriel Nützi <nuetzig (at) imes (d0t) mavt (d0t) ethz (d0t) ch>
+//
+//  This Source Code Form is subject to the terms of the GNU GPL 3.0 licence.
+//  If a copy of the GNU GPL 3.0 was not distributed with this
+//  file, you can obtain one at http://opensource.org/licenses/GPL-3.0.
+// ========================================================================================
+
+#include <stdio.h>
 
 #include "CudaFramework/Kernels/TestsGPU/KernelsTests.cuh"
 
@@ -17,7 +26,7 @@ namespace testsGPU{
 
       GPUAtomicCounter c;
       c.init();
- 
+
 
       testsKernels::branchTest_kernel<<<blocks,threads>>>(a,c);
       //testsKernels::branchTest_kernel2<<<blocks,threads>>>(a,c.counter);

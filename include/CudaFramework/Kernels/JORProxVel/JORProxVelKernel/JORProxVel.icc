@@ -1,0 +1,529 @@
+// ========================================================================================
+//  CudaFramework
+//  Copyright (C) 2014 by Gabriel Nützi <nuetzig (at) imes (d0t) mavt (d0t) ethz (d0t) ch>
+//
+//  This Source Code Form is subject to the terms of the GNU GPL 3.0 licence. 
+//  If a copy of the GNU GPL 3.0 was not distributed with this
+//  file, you can obtain one at http://opensource.org/licenses/GPL-3.0.
+// ========================================================================================
+
+#ifndef CudaFramework_Kernels_JORProxVel_JORProxVelKernel_JORProxVel_icc
+#define CudaFramework_Kernels_JORProxVel_JORProxVelKernel_JORProxVel_icc
+
+#include <iomanip>
+
+#include "CudaFramework/General/Utilities.hpp"
+#include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
+
+#include "CudaFramework/Kernels/JORProxVel/GenRandomContactGraphClass.hpp"
+
+#include "CudaFramework/Kernels/JORProxVel/LoadingCPUBuffers.hpp"
+#include "CudaFramework/Kernels/JORProxVel/BodyInitKernel/BodyInitFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactInitKernel/ContactInitFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ContactIterationKernel/ContactIterationFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/ConvergenceCheckKernel/ConvergenceCheckFunc.hpp"
+#include "CudaFramework/Kernels/JORProxVel/GPUBufferOffsets.hpp"
+
+
+template<typename TSettings >
+JORProxVelTestVariant<TSettings>::JORProxVelTestVariant() {
+
+    m_nContacts=0;
+    m_nContactCounter=0;
+    m_nRandomRunsCounter=0;
+
+    m_numberOfContacts = 0;
+
+
+}
+
+template<typename PREC >
+bool isEqualSimpleTol(PREC a,PREC b,double tolerance) {
+
+    return(std::abs(std::abs(a)-std::abs(b))<tolerance);
+}
+
+template<typename TSettings>
+bool JORProxVelTestVariant<TSettings>::compareCudaMatrices(MatrixType matrixCPU,
+                    MatrixType matrixGPU) {
+    bool isConverged = true;
+
+
+    for (unsigned int j=0; j< matrixCPU.cols(); j++) {
+
+        for(unsigned int i=0; i < matrixCPU.rows(); i++) {
+            isConverged=isConverged&&isEqualSimpleTol(matrixCPU(i,j),matrixGPU(i,j),absTol);
+
+            if(isConverged==false ) {
+                *m_pLog <<"ERROR not the same results" <<std::endl;
+                *m_pLog <<"Vectornumber row number :  "<<j <<"column number :  "<<i <<std::endl;
+                *m_pLog <<"CPU  "    <<matrixCPU(i,j)<<"GPU  "<<matrixGPU(i,j)<<std::endl;
+                isConverged=true;
+            }
+        }
+    }
+    return isConverged;
+}
+
+
+template<typename TSettings>
+bool JORProxVelTestVariant<TSettings>::compareCudaMatrices(MatrixUIntType matrixCPU,
+                    MatrixUIntType matrixGPU) {
+    bool isConverged = true;
+
+
+    for (unsigned int j=0; j< matrixCPU.cols(); j++) {
+
+        for(unsigned int i=0; i < matrixCPU.rows(); i++) {
+            isConverged=isConverged&&isEqualSimpleTol(matrixCPU(i,j),matrixGPU(i,j),absTol);
+
+            if(isConverged==false ) {
+                *m_pLog <<"ERROR not the same results" <<std::endl;
+                *m_pLog <<"Vectornumber row number :  "<<j <<"column number :  "<<i <<std::endl;
+                *m_pLog <<"CPU  "    <<matrixCPU(i,j)<<"GPU  "<<matrixGPU(i,j)<<std::endl;
+                isConverged=true;
+            }
+        }
+    }
+    return isConverged;
+}
+
+
+
+template<typename TSettings>
+void JORProxVelTestVariant<TSettings>::checkResultsMatrix(  MatrixType matrixCPU,
+                                                            MatrixType matrixGPU )
+{
+
+    if(compareCudaMatrices(matrixCPU,
+                   matrixGPU)){
+       *m_pLog<< "Results are Identical"<< std::endl;
+    }
+
+
+    typename TypeWithSize<sizeof(PREC)>::UInt m_maxUlp;
+    double m_avgUlp;
+
+
+    const double relTolGPUCPU = 1e-4;
+    const unsigned int tolUlpGPUCPU = 2000;
+
+
+    double m_maxRelTol=5E-6;
+    double m_avgRelTol=5E-6;
+    bool b1,b2,b3,b4;
+    std::tie(b1,b2,b3,b4) = Utilities::compareArraysEachCombined(matrixGPU.data(),
+                            matrixCPU.data(),
+                            matrixCPU.cols()*matrixCPU.rows(),
+                            relTolGPUCPU,
+                            tolUlpGPUCPU,
+                            m_maxRelTol,
+                            m_avgRelTol,
+                            m_maxUlp,
+                            m_avgUlp,
+                            false);
+
+
+
+
+    //TODO Eliminate warning???
+    if(b1 && b2 && b3 && b4 ) {
+        *m_pLog << " ---> GPU/CPU identical!...." << std::endl;
+    } else {
+        *m_pLog << " ---> GPU/CPU NOT identical!...." << std::endl;
+    }
+    *m_pLog << " ---> Converged relTol: "<<b1  <<" \t Identical Ulp: "<< b2
+            << "      CPU finite: "<<b3  <<" \t GPU finite: "<< b4 << std::endl;
+
+
+
+
+    *m_pLog << " ---> maxUlp: " << (double)m_maxUlp << std::endl;
+    *m_pLog << " ---> avgUlp: " << m_avgUlp << std::endl;
+    *m_pLog << " ---> maxRelTol: " << m_maxRelTol << std::endl;
+    *m_pLog << " ---> avgRelTol: " << m_avgRelTol << std::endl;  }
+
+
+
+
+template<typename TSettings>
+void JORProxVelTestVariant<TSettings>::loadToRedBufferCPU(std::vector<ContactData<PREC> >& contactDataList,
+                        VectorType & redDataList,
+                        MatrixType & contactData,
+                        MatrixUIntType indexSet)
+{
+
+    DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES
+    unsigned int j=0;
+    for(auto & d : contactDataList) {
+
+        for (int i=0; i<6; i++) {
+
+            redDataList[indexSet(j,I::redIdx_s)+i*contactData.rows()*2]=d.delta_uBody1[i];
+            redDataList[indexSet(j,I::redIdx_s+1)+i*contactData.rows()*2]=d.delta_uBody2[i];
+
+        }
+        j++;
+
+    }
+}
+
+
+
+
+
+template<typename TSettings>
+void JORProxVelTestVariant<TSettings>::reductionCPU(std::vector<ContactData<PREC> >& contactDataList,
+                                                    std::vector<BodyData <PREC> >& bodyDataList)
+{
+
+
+    for(auto & d : bodyDataList) {
+
+        d.u_2=d.u;
+
+    }
+
+     for(auto & d : contactDataList) {
+
+        bodyDataList[d.bodyIdx1].u_2+=d.delta_uBody1;
+        bodyDataList[d.bodyIdx2].u_2+=d.delta_uBody2;
+
+    }
+}
+
+
+
+template<typename TSettings>
+bool JORProxVelTestVariant<TSettings>::checkReductionBuffer(VectorType redCPU,
+                                                            VectorType redGPU) {
+
+              bool isConverged = true;
+
+
+    for (unsigned int j=0; j< redCPU.size(); j++) {
+
+            isConverged=isConverged&&isEqualSimpleTol(redCPU[j],redGPU[j],absTol);
+            *m_pLog << std::setprecision(32);
+            if(isConverged==false ) {
+                *m_pLog <<"ERROR not the same results" <<std::endl;
+                *m_pLog <<"Vectornumber row number :  "<<j <<std::endl;
+                *m_pLog <<"CPU  "    <<redCPU[j]<<"GPU  "<<redGPU[j]<<std::endl;
+                isConverged=true;
+            }
+        }
+   }
+
+template<typename TSettings >
+void JORProxVelTestVariant<TSettings>::runOnCPU() {
+
+    DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES
+    *m_pLog <<"CPU Variant Run"<<std::endl;
+
+    std::vector<BodyData<PREC> > bodyDataList(m_numberOfBodies);
+    std::vector<ContactData<PREC> > contactDataList(m_numberOfContacts);
+
+
+
+    LoadingCPUBuffers::loadComplete(   m_globalBufferCPU,   /// load all the data into the structs
+                               m_indexSetCPU,
+                               m_contBufferCPU,
+                               m_bodyBufferCPU,
+                               contactDataList,
+                               bodyDataList
+                );
+
+
+    ContactInit::calcComCF_CPU(  contactDataList,   /// calculate the W's and the contact frame
+                                 bodyDataList);
+
+
+    BodyInit::calcBodyInitCPU(bodyDataList);   /// perform the BodyInit calculations
+
+    auto begin = std::chrono::high_resolution_clock::now();
+
+    ContIter::contactiterationCPU<PREC>(contactDataList,   /// < perform the contact iteration
+                              bodyDataList);
+
+    loadToRedBufferCPU(contactDataList,
+                       m_reductionBufferCPU,
+                       m_contBufferCPU,
+                       m_indexSetCPU);  ///< Zum red buffer debuggen wird nachher nicht weiter verwendet
+
+
+
+    reductionCPU(contactDataList,
+                 bodyDataList);
+
+
+    ConvCheck::calcConvCheck<PREC>(bodyDataList);   /// < calculate the convergence check
+
+      auto end = std::chrono::high_resolution_clock::now();
+
+
+    LoadingCPUBuffers::loadBack(      m_globalBufferCPU,    ///> load the relevant contact and body data back to the matrices
+                   m_indexSetCPU,
+                   m_contBufferCPU,
+                   m_bodyBufferCPU,
+                   contactDataList,
+                   bodyDataList
+            );
+
+
+
+
+    for(auto & d : bodyDataList) {
+        DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES
+        if(d.test==false) {
+            m_globalBufferCPU(0,G::conv_s)=1;    ///< check for convergence
+        }
+    }
+
+
+    m_globalBufferCPU(0,G::iter_s)+=1;  ///< increment iteration counter
+
+    m_cpuIterationTime = std::chrono::duration<double,std::milli>(end - begin).count();
+
+    *m_pLog <<"CPU time in ms: "<< m_cpuIterationTime << std::endl;
+};
+
+
+template<typename TSettings >
+bool JORProxVelTestVariant<TSettings>::isequal(PREC a,PREC b) {
+    return(std::abs(std::abs(a)-std::abs(b))<Tolerance);
+}
+
+
+template<typename TSettings >
+void JORProxVelTestVariant<TSettings >:: initialize(std::ostream * pLog, std::ostream * pData) {
+
+    m_pData = pData;
+    m_pLog = pLog;
+    *m_pLog <<"initialize "<<std::endl;
+    m_nContactCounter =  ((int)(minNContacts + (stepNContacts -1 ) ) / stepNContacts) * stepNContacts ;
+
+    if(m_nContactCounter <=0) {
+        m_nContactCounter = stepNContacts;
+    }
+
+    m_nRandomRunsCounter =0;
+
+    std::srand ( (unsigned int)time(NULL) );
+
+    m_gpuVariant.initialize(m_pLog);
+
+}
+
+template<typename TSettings >
+bool JORProxVelTestVariant<TSettings >::generateNextTestProblem() {
+
+    DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES
+
+    RandomGeneratorType randGen(m_seed);
+    DistributionType distGen(1.0 , 3.0);
+
+    *m_pLog <<"generate next test problem"<<std::endl;
+
+    if(m_nContactCounter>maxNContacts) {
+        *m_pLog << "No more Test Problems to generate, --->exit ============="<<std::endl;
+        return false;
+    }
+
+
+    m_nContacts = m_nContactCounter;
+    *m_pLog << "Compute test for nBodies : "<< m_nContacts <<" ============="<<std::endl;
+
+    m_numberOfBodies = m_nContacts;
+
+
+    /// ===============================================================  ///
+
+    m_bodyBufferGPU.resize(m_numberOfBodies,m_bodyBufferLength);
+    m_bodyBufferCPU.resize(m_numberOfBodies,m_bodyBufferLength);
+
+    m_globalBufferGPU.resize(m_rowsInGlobalBuffer,m_globalBufferLength);
+    m_globalBufferCPU.resize(m_rowsInGlobalBuffer,m_globalBufferLength);
+
+    RndGraph::randomSeg2::getContNum(m_numberOfBodies,m_contPerBody,m_numberOfContacts);
+
+     *m_pLog << "numberOfContacts : "<< m_numberOfContacts <<std::endl;
+     *m_pLog << "numberOfBodies : "<< m_numberOfBodies <<std::endl;
+
+    m_contBufferGPU.resize(m_numberOfContacts,m_contactBufferLength);
+    m_contBufferCPU.resize(m_numberOfContacts,m_contactBufferLength);
+
+    m_indexSetGPU.resize(m_numberOfContacts,m_indexSetLength);
+    m_indexSetCPU.resize(m_numberOfContacts,m_indexSetLength);
+
+    m_numberOfReductions = B::u1_l*2*m_numberOfContacts; ///< 12 = 2 * u_l
+
+    m_reductionBufferGPU.resize(m_numberOfReductions);
+    m_reductionBufferCPU.resize(m_numberOfReductions);
+
+    m_csrGPU.resize(m_numberOfBodies);
+    m_csrCPU.resize(m_numberOfBodies);
+    /// ===============================================================  ///
+
+    //reset randomRun
+    m_nRandomRunsCounter = 0;
+
+    m_gpuVariant.initializeTestProblem(m_numberOfContacts,
+                                       m_bodyBufferGPU,
+                                       m_contBufferGPU,
+                                       m_globalBufferGPU,
+                                       m_indexSetGPU);
+
+    // Increment counter
+    m_nContactCounter += stepNContacts;
+
+    return true;
+}
+
+template<typename TSettings >
+bool JORProxVelTestVariant<TSettings >::generateNextRandomRun() {
+
+    DEFINE_JORPROXVEL_GPUBUFFER_OFFSET_NAMESPACES
+
+    RandomGeneratorType randGen(m_nRandomRunsCounter);
+    DistributionType distGen(1.0 , 3.0);
+
+    *m_pLog<<"generate next random run"<<std::endl;
+    if(m_nRandomRunsCounter < maxNRandomRuns) {
+        m_nRandomRunsCounter++;
+    } else {
+        return false;
+    }
+
+    *m_pLog << "Random Run # : "<<m_nRandomRunsCounter<<std::endl;
+
+    // Set Values! ==============================
+    // Generate a function object (unary function which takes a dummy parameter and return random value)
+    std::function<PREC(PREC)> func = [&](PREC dummy) {
+        return distGen(randGen);
+    };
+    // oder auto func = ....
+
+    // ==========================================
+    ///  ========================================================================  ///
+
+    m_bodyBufferGPU = m_bodyBufferGPU.array().unaryExpr(func); // hand over this unaray function to eigen unaryExpr(...)
+    m_bodyBufferCPU = m_bodyBufferGPU;
+
+   RndGraph::template generateRandomSetup< typename RndGraph::randomSeg2 , false >(m_numberOfBodies,
+                                                           m_contPerBody,
+                                                           m_csrGPU,
+                                                           m_contBufferGPU,
+                                                           m_indexSetGPU);
+
+
+    m_numberOfContacts=m_contBufferCPU.rows();
+     /***
+     Some Matrices have to be resized here as they are dependent on the number of contacts which is shuffled for every random run!!!
+
+     ***/
+
+
+
+    m_contBufferGPU = m_contBufferGPU.array().unaryExpr(func); // hand over this unaray function to eigen unaryExpr(...)
+    m_contBufferCPU = m_contBufferGPU;
+
+    for(int i=0; i< m_reductionBufferGPU.size(); i++) {
+        m_reductionBufferGPU[i]=i*0.45;
+    }
+
+    for(int z=0; z<m_rowsInGlobalBuffer; z++) {
+        for(int i=0; i<m_globalBufferLength; i++) {
+            m_globalBufferGPU(z,i) = 0 ; // hand over this unaray function to eigen unaryExpr(...)
+        }
+    }
+
+    m_globalBufferCPU=m_globalBufferGPU;
+    m_reductionBufferCPU=m_reductionBufferGPU;
+    m_indexSetCPU=m_indexSetGPU;
+    m_csrCPU=m_csrGPU;
+    m_contBufferCPU = m_contBufferGPU;
+    m_bodyBufferCPU = m_bodyBufferGPU;
+
+    ///  ========================================================================  ///
+
+    return true;
+}
+
+template<typename TSettings >
+void JORProxVelTestVariant<TSettings >::checkResults() {
+
+    checkReductionBuffer(m_reductionBufferCPU,
+                         m_reductionBufferGPU);
+
+    *m_pLog << "Checking Contact Buffer "<< std::endl;
+
+    checkResultsMatrix(m_contBufferCPU,
+                            m_contBufferGPU);
+
+    *m_pLog << "Checking Body Buffer "<< std::endl;
+
+    checkResultsMatrix(m_bodyBufferCPU,
+                             m_bodyBufferGPU);
+
+    compareCudaMatrices(m_globalBufferCPU,
+                       m_globalBufferGPU);
+
+
+}
+
+template<typename TSettings >
+void JORProxVelTestVariant<TSettings >::writeData() {
+       *m_pData << tinyformat::format("%d\t",m_nContacts);
+}
+
+template<typename TSettings >
+void JORProxVelTestVariant<TSettings >::runOnGPU() {
+
+
+
+    *m_pLog <<"run on GPU entered"<<std::endl;
+
+
+
+    m_gpuVariant.run(m_contBufferGPU.rows(),
+
+                     m_bodyBufferGPU,
+                     m_contBufferGPU,
+                     m_globalBufferGPU,
+                     m_reductionBufferGPU,
+                     m_indexSetGPU,
+                     m_csrGPU,
+                     m_bodyBufferGPU.rows());
+
+    m_elapsedTimeCopyToGPU=m_gpuVariant.m_elapsedTimeCopyToGPU;
+    m_elapsedTimeCopyFromGPU=m_gpuVariant.m_elapsedTimeCopyFromGPU;
+    m_gpuIterationTime=m_gpuVariant.m_gpuIterationTime;
+
+}
+
+template<typename TSettings >
+void JORProxVelTestVariant<TSettings >::writeHeader() {
+    *m_pData << "Kernel used: \t\t"<< GPUVariantType::getVariantName()<<std::endl;
+    *m_pData << "Kernel Settings: \t\t" << GPUVariantType::getVariantDescription() << std::endl;
+    *m_pLog  << "Kernel used: \t\t"<< GPUVariantType::getVariantName()<<std::endl;
+    *m_pData << "Total Test Problems Per Contact (per Size): \t\t"<< maxNRandomRuns <<std::endl;
+    *m_pData << "PREC : "<<"\t"<< typeid(PREC).name() <<std::endl;
+}
+
+template<typename TSettings >
+void JORProxVelTestVariant<TSettings >::writeDataColumHeader() {
+    *m_pData << "# nContacts";
+}
+
+template<typename TSettings >
+void JORProxVelTestVariant<TSettings >::cleanUpTestProblem() {
+
+    *m_pLog  <<"Clean up Test Problem"<<std::endl;
+     m_gpuVariant.cleanUpTestProblem();
+
+}
+
+
+
+
+#endif
