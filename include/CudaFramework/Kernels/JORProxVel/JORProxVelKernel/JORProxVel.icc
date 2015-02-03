@@ -464,9 +464,7 @@ void JORProxVelTestVariant<TSettings >::checkResults() {
 
 template<typename TSettings >
 void JORProxVelTestVariant<TSettings >::writeData() {
-       using namespace boost;
-       *m_pData << boost::format("%1$.9d\t")
-            % m_nContacts;
+       *m_pData << tinyformat::format("%d\t",m_nContacts);
 }
 
 template<typename TSettings >

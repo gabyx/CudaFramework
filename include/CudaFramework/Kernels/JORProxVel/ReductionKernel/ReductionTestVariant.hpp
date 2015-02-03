@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <chrono>
 #include <iostream>
-#include <boost/format.hpp>
+#include <tinyformat/TinyFormatInclude.hpp>
 
 #include "CudaFramework/CudaModern/CudaUtilities.hpp"
 #include "CudaFramework/General/AssertionDebug.hpp"

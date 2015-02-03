@@ -9,7 +9,7 @@
 
 #include <Eigen/Dense>
 
-#include <boost/format.hpp>
+#include <tinyformat/TinyFormatInclude.hpp>
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 
 

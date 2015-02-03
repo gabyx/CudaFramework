@@ -250,9 +250,7 @@ void ReductionTestVariant<VariantLaunchSettings >::checkResults() {
 
 template<typename VariantLaunchSettings >
 void ReductionTestVariant<VariantLaunchSettings >::writeData() {
-       using namespace boost;
-       *m_pData << boost::format("%1$.9d\t")
-            % m_nContacts;
+       *m_pData << tinyformat::format("%d\t",m_nContacts);
 }
 
 template<typename VariantLaunchSettings >
@@ -260,7 +258,6 @@ void ReductionTestVariant<VariantLaunchSettings >::runOnGPU() {
 
 
     *m_pLog<<"run on GPU entered"<<std::endl;
-
 
 
     m_gpuVariant.run( numberOfContacts,

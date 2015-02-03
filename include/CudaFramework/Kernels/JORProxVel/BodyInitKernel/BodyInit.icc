@@ -2,7 +2,7 @@
 #define BodyInit_icc
 
 #include <vector>
-
+#include <tinyformat/TinyFormatInclude.hpp>
 #include "CudaFramework/General/Utilities.hpp"
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 #include "CudaFramework/Kernels/JORProxVel/GeneralStructs.hpp"
@@ -249,9 +249,7 @@ void BodyInitTestVariant<TSettings >::checkResults() {
 
 template<typename TSettings >
 void BodyInitTestVariant<TSettings >::writeData() {
-       using namespace boost;
-       *m_pData << boost::format("%1$.9d\t")
-            % m_nContacts;
+     *m_pData << tinyformat::format("%d\t",m_nContacts);
 }
 
 template<typename TSettings >

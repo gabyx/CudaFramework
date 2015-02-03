@@ -39,10 +39,8 @@ int main()
          >
     > test1;
 
-    std::cout<<"blabla"<<std::endl;
     PerformanceTest<test1> A("test1");
     A.run();
-    std::cout<<"blabla End"<<std::endl;
 
 
 

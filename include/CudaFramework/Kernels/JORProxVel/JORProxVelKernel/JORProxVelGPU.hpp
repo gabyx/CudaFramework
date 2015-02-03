@@ -7,7 +7,7 @@
 #include <chrono>
 #include <random>
 
-#include <boost/format.hpp>
+#include <tinyformat/TinyFormatInclude.hpp>
 
 #include "CudaFramework/CudaModern/CudaMatrixUtilities.hpp"
 #include "CudaFramework/CudaModern/CudaMatrix.hpp"
