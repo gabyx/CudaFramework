@@ -154,6 +154,15 @@ Launching the iterations would look similar to this example:
 ```
 Matrices ``m_T`` and ``m_d`` are built as described in the paper. Vector ``m_mu`` are the friction coefficients for all contacts which consist of a normal and two tangential forces. The percussions ``P_back`` and ``P_front`` are contact ordered and each contact tuple consits of (normal percussion, tangential percussion 1, tangential percussion 2, see the description in the paper).
 
+## Example Usage Sparse JORProx Velocity
+In this section some short explanations of the sparse JORProx scheme which iterates in the velocities should be given.
+This implementation is based on the master thesis of Thierry Baasch available here [1](http://www.zfm.ethz.ch/~nuetzig/_private_files/projectiveBaasch.pdf)
+and is closely related to the implementation of 
+
+> Million Body Simulations of Granular Dynamics on the GPU,” H. Mazhar, T. Heyn, A. Tasora, M. Anitescu, D. Negrut, accepted, SIAM Conference on Computational Science and Engineering, Reno, NV, 2011
+
+We used speciali designed segmented reduction kernel adapted from [ModernGPU](http://www.moderngpu.com).
+Tutorial to come!
 
 
 --------------------------
