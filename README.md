@@ -11,6 +11,8 @@ The corresponding [master thesis](http://dx.doi.org/10.3929/ethz-a-010054012) sh
 This source code includes also the **sparse JORProx Velocity** GPU methods which is based on the following master thesis of Thierry Baasch available here [1](http://www.zfm.ethz.ch/~nuetzig/_private_files/projectiveBaasch.pdf)
 
 ---------------------------
+
+[![Join the chat at https://gitter.im/gabyx/CudaFramework](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gabyx/CudaFramework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Installation & Dependencies
 ---------------------------
 To build the performance tests (MatrixMultiply, Prox, etc.) you need the built tool [cmake](
