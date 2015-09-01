@@ -4,7 +4,7 @@ Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems
 
 This source code includes the **dense Jacobi (JORProx) and Gauss-Seidel (SORProx)** GPU methods described in the paper  
 
-> **G. Nützi et al. , Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems, 2014** , download : [1](http://proceedings.asmedigitalcollection.asme.org/proceeding.aspx?articleID=2091012) or [2](http://www.zfm.ethz.ch/~nuetzig/_private_files/projective.pdf)
+> **G. Nützi et al. , Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems, 2014** , download : [1](http://proceedings.asmedigitalcollection.asme.org/proceeding.aspx?articleID=2091012) or [2](http://www.zfm.ethz.ch/~nuetzig/files/projective.pdf)
 
 The corresponding [master thesis](http://e-collection.library.ethz.ch/view/eth:7929?q=Gabriel%20N%C3%BCtzi) should be consulted only in the case of being interested in the details of certain GPU variants (see below).
 
