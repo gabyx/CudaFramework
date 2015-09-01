@@ -158,7 +158,7 @@ Matrices ``m_T`` and ``m_d`` are built as described in the paper. Vector ``m_mu`
 
 ## Example Usage Sparse JORProx Velocity
 In this section some short explanations of the sparse JORProx scheme which iterates in the velocities should be given.
-This implementation is based on the master thesis of Thierry Baasch available here [1](http://www.zfm.ethz.ch/~nuetzig/_private_files/projectiveBaasch.pdf)
+This implementation is based on the master thesis of Thierry Baasch available here [1](http://www.zfm.ethz.ch/~nuetzig/files/projectiveBaasch.pdf)
 and is closely related to the implementation of 
 
 > Million Body Simulations of Granular Dynamics on the GPU,” H. Mazhar, T. Heyn, A. Tasora, M. Anitescu, D. Negrut, accepted, SIAM Conference on Computational Science and Engineering, Reno, NV, 2011
