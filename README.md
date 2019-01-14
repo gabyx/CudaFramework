@@ -1,4 +1,3 @@
-=
 Projective Jacobi and Gauss-Seidel on the GPU for Non-Smooth Multi-Body Systems
 =
 
